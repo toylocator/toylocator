@@ -1,27 +1,18 @@
 # Toy Locator
 
 > Leo (4 years old): Mommy, have you seen my spiderman?
-
 > Mom: No. I saw it yesterday from the bathroom. 
-
 > (after 10 mins) 
-
 > Dad: Honey, have you seen my key?
-
 > Mom: You ask everyday. Can you put it next to the door where it should be? 
-
 > Dad: That is not the answer I was looking for. 
-
 > (silence) 
 
-#### after 2 years
+2 years Later
 
 > Leo (6 years old): Hey toy locator, where is the blue Ironman. 
-
 > Toy Locator: The blue Ironman is at bedroom number 2 right below the red chair on the left side of the room.
-
 > Leo: Thanks Toy Locator. 
-
 > Toy Locator: You are welcome. 
 
 
