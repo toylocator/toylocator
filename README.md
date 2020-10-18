@@ -32,9 +32,16 @@
 - simplification: mobile phone -> nx camera -> raw input video file
 - input prep: create video manually
 - input: video 
-- output: datasets forr single object 
-- parse images, augment 
- - create training datasets / test datasets 
+- output: datasets for single object
+- reference
+	- [w251/week08](https://github.com/MIDS-scaling-up/v2/tree/master/week08)
+1. parse video to images
+	- ffmpeg 
+		- https://hub.docker.com/r/jrottenberg/ffmpeg/ 
+		- https://hub.docker.com/r/linuxserver/ffmpeg 
+2. augment images
+	1. https://github.com/codebox/image_augmentor
+3. create training datasets / test datasets 
 
 #### Training the model 
 - input: dataset 
