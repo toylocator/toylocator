@@ -44,3 +44,39 @@
 	- scenes of rooms (one or multiple of them has the object)
 - Output
 	- detect objects with probability 
+	
+	
+
+
+## overall architecture / flow 
+
+#### (Temp Name: Labeller) creating training dataset 
+- simplification: mobile phone -> nx camera -> raw input video file
+- input prep: create video manually
+- input: video 
+- output: datasets forr single object 
+- parse images, augment 
+ - create training datasets / test datasets 
+
+#### Training the model 
+- input: dataset 
+- output: model 
+- (todo): how well it performs without labeling 
+1. Pre-trained model (imagenet, yolov5, googlenet)
+2. train model and test 
+ 
+#### Inteferece 
+- simplification: live video -> image of scene 
+- testing prep: manually label objects from scenes
+- input: image of scene, object name (e.g., blue spiderman)
+- output: rectangular on the image 
+
+#### Broker  
+- something to think about 
+- each device needs to update the model the central device 
+- federated learning? 
+
+
+## set up 
+
+
