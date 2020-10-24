@@ -10,16 +10,30 @@
 	- ffmpeg 
 		- https://hub.docker.com/r/jrottenberg/ffmpeg/ 
 		- https://hub.docker.com/r/linuxserver/ffmpeg 
-2. augment images
-	- https://github.com/codebox/image_augmentor
-	- robotflow 
-3. create training datasets / test datasets 
+2. label images 
+	- [labelImg](https://github.com/tzutalin/labelImg)
+3. augment images
+	- [image_augmentor](https://github.com/codebox/image_augmentor)
+4. create training datasets / test datasets 
+5. 
 
 
 #### Setup 
 [TODO convert to docker-compose to simply]
-```
-cd labeller
-docker build -t labeller -f Dockerfile.labeller .
+
+[TODO create our own docker with ffmpeg and labelimg] 
 
 ```
+docker run -ti -v $PWD:/images/data ryandejana/lab8:v1 bash
+
+#docker build -t labeller -f data/Dockerfile.labeller .
+```
+
+Dockerless 
+```
+mkdir 2234
+ffmpeg -i video/IMG_2234.MOV -frames:v 100 -r 2 images/2234/extract%03d.jpg
+
+```
+
+Label the images 
