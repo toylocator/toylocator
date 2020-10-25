@@ -50,7 +50,7 @@
 1. Pre-trained model (imagenet, yolov5, googlenet)
 2. train model and test 
  
-#### Inteferece 
+#### Inference 
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 - input: image of scene, object name (e.g., blue spiderman)
