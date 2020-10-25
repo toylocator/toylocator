@@ -85,22 +85,9 @@ xhost +
 docker run --name detector --network nx_default --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti toydetector 
 ```
 
-# motion face detector code 
-
-
-```
-
-
-
-running yolov5 detector 
-https://github.com/taeil/w251/tree/master/week01/lab 
-
 #### 6. Broker / cloud 
 - (depends on the possibility of incremental training)
 - training happens in the central place where all the training dataset is kept. 
-
-
-
 
 
 ## Problem 
