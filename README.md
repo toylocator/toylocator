@@ -12,6 +12,7 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 
 ## overall architecture / flow 
 
+![](overall_arch.png)
 
 #### (Toy Registration) creating (additional) dataset
 - ***input***: video
