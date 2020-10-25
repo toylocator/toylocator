@@ -1,26 +1,34 @@
 # Toy Locator
 
-
+## PoC 
+PoC was done on week 9 (Oct. 24th) with the following simplificiation. 
+1. Take video of 5 toys (mobile phone)
+2. Convert to images ([ffmpeg\(https://ffmpeg.org/) )
+3. Label the images ([labelImg](https://github.com/tzutalin/labelImg))
+4. Augment the images (Roboflow)
+5. Split train/valid/test dataset (Roboflow)
+6. Train the custom object detection model (Colab)
+7. Run inference on test dataset (Colab and NX)
 
 ## overall architecture / flow 
 
-#### (Temp Name: Labeller) creating raw images 
-- simplification: mobile phone -> nx camera -> raw input video file
-- input prep: create video manually
-- input: video 
-- output: datasets for single object
-- add guideline to camera view 
 
-#### (registerar) creating (additional) dataset
-- labelimg
-- roboflow for 3 augmentation, split dataset (train/valid/test), data.yaml
+#### (Toy Registration) creating (additional) dataset
+- ***input***: video
+- ***output***: datasets for a single object
+- simplification: mobile phone -> nx camera -> raw input video file
+- Convert to images ([ffmpeg\(https://ffmpeg.org/) )
+- Label the images ([labelImg](https://github.com/tzutalin/labelImg))
 - combine data with existing data 
 (todo) explore the following options 
-classes.txt: automatically 
-option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
-option 2. segmentation, automatically label. (potentially publishable)  
-option 3. 
-(todo0 further research on automatic labelling 
+- classes.txt: automatically 
+- option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
+- option 2. segmentation, automatically label. (potentially publishable)  
+(todo) further research on automatic labelling
+(todo) replace roboflow usages 
+- augment images using [image_augmentor](https://github.com/codebox/image_augmentor)
+- for augmentation, splitting dataset and data.yaml creation
+(idea) add guideline to camera view  
 
 #### Training the model 
 (todo) train on nx taeil has OOM, chenlin has syntax error, hongsuk has catch up to do. 
