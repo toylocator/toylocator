@@ -63,15 +63,19 @@ To run yolov5 docker,
 ```
 # CD to toylocator repo before starting the docker
 
-docker run --rm --privileged --runtime nvidia -v $PWD/modeling/pretrained:/toypt -v $PWD/data:/data -p 8888:8888 -p 6006:6006 -ti yolov5
+docker run -e DISPLAY=$DISPLAY --name toylocator --rm --privileged --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+
 ```
 
 To train
 ```
 # I removed --cache parameter in case. 
-# python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results 
 
-!python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --nosave --cache
+# optino 1
+python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results 
+
+# option 2
+python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --cache
 
 ```
 
@@ -95,10 +99,13 @@ To run inference on the camera,
 # must run this command on NX terminal (not SSH)
 xhost +
 
-docker run --name toyloator --rm --privileged -e DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toypt -v $PWD/data:/data -p 8888:8888 -p 6006:6006 -ti yolov5
+docker run --name toylocator --rm --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
 
-#inside of docker
+# generic detection for sanity check
 python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
+
+# run toy detection 
+python3 detect.py --source 1 --weights /toy_pt/best_v1024_5toys.pt --conf 0.4
 
 ```
 
