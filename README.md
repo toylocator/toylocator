@@ -59,10 +59,18 @@ Explore the following options
 1. Pre-trained model ([TODO imagenet], yolov5, [TODO googlenet])
 2. Train model and test 
 
-To run yolov5 manually, 
+To run yolov5 docker, 
 ```
-docker run --rm  --privileged --runtime nvidia -v $PWD:/usr/src/app/yolov5/toy -p 8888:8888 -ti yolov5
+# CD to toylocator repo before starting the docker
+
+docker run --rm --privileged --runtime nvidia -v $PWD:/usr/src/app/toy -p 8888:8888 -ti yolov5
 ```
+
+To train
+```
+python train.py --img 416 --batch 16 --epochs 100 --data '../data.yaml' --cfg ./models/custom_yolov5s.yaml --weights '' --name yolov5s_results  --cache
+```
+
 
 #### 5. Inference 
 - simplification: live video -> image of scene 
@@ -82,7 +90,7 @@ To run inference on the camera,
 ```
 # must run this command on NX terminal (not SSH)
 xhost +
-docker run --name detector --network nx_default --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti toydetector 
+docker run --name detector --network nx_default --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti yolov5 
 ```
 
 #### 6. Broker / cloud 
