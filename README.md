@@ -3,7 +3,7 @@
 ## PoC 
 PoC was done on week 9 (Oct. 24th) with the following simplificiation. 
 1. Take video of 5 toys (mobile phone)
-2. Convert to images ([ffmpeg\(https://ffmpeg.org/) )
+2. Convert to images ([ffmpeg](https://ffmpeg.org/) )
 3. Label the images ([labelImg](https://github.com/tzutalin/labelImg))
 4. Augment the images (Roboflow)
 5. Split train/valid/test dataset (Roboflow)
@@ -63,12 +63,20 @@ To run yolov5 docker,
 ```
 # CD to toylocator repo before starting the docker
 
-docker run --rm --privileged --runtime nvidia -v $PWD:/usr/src/app/toy -p 8888:8888 -ti yolov5
+docker run -e DISPLAY=$DISPLAY --name toylocator --rm --privileged --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+
 ```
 
 To train
 ```
-python train.py --img 416 --batch 16 --epochs 100 --data '../data.yaml' --cfg ./models/custom_yolov5s.yaml --weights '' --name yolov5s_results  --cache
+# I removed --cache parameter in case. 
+
+# optino 1
+python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results 
+
+# option 2
+python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --cache
+
 ```
 
 
@@ -90,7 +98,15 @@ To run inference on the camera,
 ```
 # must run this command on NX terminal (not SSH)
 xhost +
-docker run --name detector --network nx_default --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti yolov5 
+
+docker run --name toylocator --rm --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+
+# generic detection for sanity check
+python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
+
+# run toy detection 
+python3 detect.py --source 1 --weights /toy_pt/best_v1024_5toys.pt --conf 0.4
+
 ```
 
 #### 6. Broker / cloud 
