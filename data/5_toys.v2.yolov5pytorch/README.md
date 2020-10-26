@@ -3,9 +3,9 @@
 5 toys, 3xx images
 
 #### Test result during the training
-![[tensorboard.png]]
+![](tensorboard.png)
 
-![[plot.png]]
+![](plot.png)
 
 #### But Initial Results In Real Life Testing 
 Not detecting... 
