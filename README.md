@@ -10,9 +10,9 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 6. Train the custom object detection model (Colab)
 7. Run inference on test dataset (Colab and NX)
 
-## overall architecture / flow 
 ![](flow.png) (source: https://roboflow.com/)
 
+## overall architecture / flow 
 ![](overall_arch.png)
 
 [TODO] convert to docker-compose to simply NX deployments
