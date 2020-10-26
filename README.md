@@ -11,59 +11,91 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 7. Run inference on test dataset (Colab and NX)
 
 ## overall architecture / flow 
+![](flow.png) (source: https://roboflow.com/)
 
 ![](overall_arch.png)
 
-#### (Toy Registration) creating (additional) dataset
+[TODO] convert to docker-compose to simply NX deployments
+[TODO] automotically trigger all of the processing and download the model automatically in xx mins
+
+## (Toy Registration) creating (additional) dataset
 - ***input***: video
 - ***output***: datasets for a single object
 - simplification: mobile phone -> nx camera -> raw input video file
-- Convert to images ([ffmpeg\(https://ffmpeg.org/) )
-- Label the images ([labelImg](https://github.com/tzutalin/labelImg))
-- combine data with existing data 
-(todo) explore the following options 
-- classes.txt: automatically 
-- option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
-- option 2. segmentation, automatically label. (potentially publishable)  
-(todo) further research on automatic labelling
-(todo) replace roboflow usages 
-- augment images using [image_augmentor](https://github.com/codebox/image_augmentor)
-- for augmentation, splitting dataset and data.yaml creation
-(idea) add guideline to camera view  
 
-#### Training the model 
-(todo) train on nx taeil has OOM, chenlin has syntax error, hongsuk has catch up to do. 
-(todo) can we train incrementally? 
-- input: dataset 
-- output: model 
-- (todo): test option 1 of dataset creation how well it performs without labeling 
-1. Pre-trained model (imagenet, yolov5, googlenet)
-2. train model and test 
- 
-#### Inteferece 
+#### 1. Collect Video 
+Capture a video using mobile phone
+[TODO] Capture a video using a camera using NX (modifiy detect.py)
+[TODO] add guideline to camera view
+
+#### 2. Convert Images ([ffmpeg](https://ffmpeg.org/) )
+Convert videos to images 
+```
+ffmpeg -i video/IMG_xxxx.MOV -frames:v 100 -r 2 images/toy_xxxx%03d.jpg
+```
+
+#### 3. Preparing Training Datasets
+ [TODO] replace roboflow usages for augmentation, splitting dataset and creating data.yaml creation! 
+1. Manually label the images using [labelImg](https://github.com/tzutalin/labelImg))
+	1. label new images 
+	2. [TODO] merge with existing classes.txt and update class ID
+	3. [TODO] validate label and image sizes
+2. Augment annotated images
+	1.  [TODO] augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
+
+#### 3. Automatic label
+Manual labelling images is not feasible options for actual real life scenario. 
+Explore the following options 
+- [TODO] option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
+- [TODO] option 2. segmentation, automatically label. (potentially publishable)  
+- [TODO] further research on automatic labelling 
+
+#### 4. Training the model 
+[TODO train on nx taeil has OOM, chenlin has syntax error, hongsuk has catch up to do.] 
+[TODO can we train incrementally?] 
+- ***input***: dataset
+- ***output***: models (best.pt) 
+- [TODO test option 1 of dataset creation how well it performs without labeling] 
+1. Pre-trained model ([TODO imagenet], yolov5, [TODO googlenet])
+2. Train model and test 
+
+To run yolov5 docker, 
+```
+# CD to toylocator repo before starting the docker
+
+docker run --rm --privileged --runtime nvidia -v $PWD:/usr/src/app/toy -p 8888:8888 -ti yolov5
+```
+
+To train
+```
+python train.py --img 416 --batch 16 --epochs 100 --data '../data.yaml' --cfg ./models/custom_yolov5s.yaml --weights '' --name yolov5s_results  --cache
+```
+
+
+#### 5. Inference 
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
-- input: image of scene, object name (e.g., blue spiderman)
-- output: rectangular on the image
-(todo) detect source camera (for fun)
-(todo) test more with different test images (rooms)
+- ***input***: image of scene, live feed from camera 
+- ***input***: object name (e.g., blue dump truck)
+- ***output***: rectangular on the image or display
+[TODO source camera] 
+[TODO test more with different test images (rooms)] 
 
-#### Broker / cloud 
+To run inference on test dataset
+```
+!python3 detect.py --weights toy/modeling/pretrained/best_v1024_5toys.pt --img 416 --conf 0.4 --source "toy/data/4 toys.v2.yolov5pytorch/test/images"
+```
+
+To run inference on the camera, 
+```
+# must run this command on NX terminal (not SSH)
+xhost +
+docker run --name detector --network nx_default --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti yolov5 
+```
+
+#### 6. Broker / cloud 
 - (depends on the possibility of incremental training)
 - training happens in the central place where all the training dataset is kept. 
-
-## Phase 1 
-#### Training (transfer learning or embedding) on mobile phone or NX or Raspberry Pi
-1. Pre-trained model (imagenet, yolov5, googlenet) 
-2. Load them 
-3. Capturing video 
-4. Augment to increase training set 
-5. Create training set (separate out test set) 
-
-
-
-
-
 
 
 ## Problem 
