@@ -99,12 +99,12 @@ To run inference on the camera,
 # must run this command on NX terminal (not SSH)
 xhost +
 
-docker run --name toylocator --rm --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+docker run --name toylocator --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
 
-# generic detection for sanity check
+# generic detection for sanity check (please change to 0)
 python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
 
-# run toy detection 
+# run toy detection with camera (please change to 0)
 python3 detect.py --source 1 --weights /toy_pt/best_v1024_5toys.pt --conf 0.4
 
 ```
