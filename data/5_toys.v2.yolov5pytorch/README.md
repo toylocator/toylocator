@@ -1,3 +1,7 @@
+# v1024 Test Result
+
+5 toys, 3xx images
+
 #### Test result during the training
 ![[tensorboard.png]]
 
