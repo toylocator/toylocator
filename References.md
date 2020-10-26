@@ -3,7 +3,9 @@
 
 #### Object Detection 
 - [ultralytics/yolov5](https://github.com/ultralytics/yolov5)
+- [yolov5 docker](https://github.com/ultralytics/yolov5/wiki/Docker-Quickstart)
 - [YOLOv5 Tutorial](https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb#scrollTo=VUOiNLtMP5aG) 
+- [251 week 1 lab](https://github.com/MIDS-scaling-up/v2/tree/master/week01/lab)
 
 #### Training dataset
 - [w251/week08](https://github.com/MIDS-scaling-up/v2/tree/master/week08)
@@ -14,3 +16,7 @@
 		- https://hub.docker.com/r/linuxserver/ffmpeg 
 2. label images: [labelImg](https://github.com/tzutalin/labelImg)
 3. augment images: [image_augmentor](https://github.com/codebox/image_augmentor)
+
+#### Incremental Learning 
+- [Learning Deep Neural Networks Incrementally](https://medium.com/heuritech/learning-deep-neural-networks-incrementally-3e005e4fb4bc)
+- 
