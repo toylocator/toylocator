@@ -13,7 +13,12 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 ![](flow.png) (source: https://roboflow.com/)
 
 ## overall architecture / flow 
+
+all with Jetson Xavier NX
 ![](overall_arch.png)
+
+Training on Cloud
+![](overall_arch_cloud.png)
 
 [TODO] convert to docker-compose to simply NX deployments
 [TODO] automotically trigger all of the processing and download the model automatically in xx mins
