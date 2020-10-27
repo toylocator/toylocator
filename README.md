@@ -14,10 +14,10 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 
 ## overall architecture / flow 
 
-all with Jetson Xavier NX
+#### all with Jetson Xavier NX
 ![](overall_arch.png)
 
-Training on Cloud
+#### Training on Cloud
 ![](overall_arch_cloud.png)
 
 [TODO] convert to docker-compose to simply NX deployments
