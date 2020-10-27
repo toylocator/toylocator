@@ -11,10 +11,8 @@
 Not detecting... 
 ![](webcam_inference.png)
 
-
-If I put the toy really closer to the camera, sometimes it detects with low confidence
-![[close_to_camera.png]]
-
+Well, if I put the toy really closer to the camera, sometimes it detects with low confidence
+![](close_to_camera.png)
 
 #### Next
 - [TODO] Test with more static images instead of camera feed
