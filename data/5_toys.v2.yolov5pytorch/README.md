@@ -1,19 +1,13 @@
-# v1024 Test Result
+# v1026 Test Result
 
-5 toys, 3xx images
+#### comparing to v1024
+resize without strecthing 
 
 #### Test result during the training
-![](tensorboard.png)
+![](tensorboard_v1026.png)
 
-![](plot.png)
-
-#### But Initial Results In Real Life Testing 
-Not detecting... 
-![](webcam_inference.png)
-
-Well, if I put the toy really closer to the camera, sometimes it detects with low confidence
-![](close_to_camera.png)
+#### Initial Results In Real Life Testing 
+![](webcam_inteference_1026.png)
 
 #### Next
-- [TODO] Test with more static images instead of camera feed
-- [TODO] More augmentation and more taining images 
+- [TODO] Match the dimension for camera and training images 

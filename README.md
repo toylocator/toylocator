@@ -105,7 +105,7 @@ docker run --name toylocator --privileged -e DISPLAY=$DISPLAY --runtime nvidia -
 python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
 
 # run toy detection with camera (please change to 0)
-python3 detect.py --source 1 --weights /toy_pt/best_v1024_5toys.pt --conf 0.4
+python3 detect.py --source 1 --weights /toy_pt/best_v1026_5toys.pt --conf 0.4
 
 ```
 
