@@ -31,7 +31,6 @@ ImportError: libGL.so.1: cannot open shared object file: No such file or directo
 	```
 
 #### Setup
-
 Make sure firewall rules
 ```
 aws ec2 authorize-security-group-ingress --group-id  sg-9c7e77b4   --protocol tcp --port 22 --cidr 0.0.0.0/0
@@ -50,6 +49,8 @@ aws ec2 run-instances --image-id ami-0384cb16509f0e03b --instance-type g4dn.2xla
 
 #### Setup
 ![Dockerfile](Dockerfile.cloud.yolov5) based on [Yolov5-based docker](https://github.com/ultralytics/yolov5/blob/master/Dockerfile)
+
+[Containers: nvidia:pytorch](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch/layers)
 
 [TODO] fix warning 
 NOTE: MOFED driver for multi-node communication was not detected.
