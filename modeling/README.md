@@ -48,14 +48,15 @@ aws ec2 run-instances --image-id ami-0384cb16509f0e03b --instance-type g4dn.2xla
 ```
 
 #### Setup
-![Dockerfile](Dockerfile.cloud.yolov5) based on [Yolov5-based docker](https://github.com/ultralytics/yolov5/blob/master/Dockerfile)
+[Dockerfile](Dockerfile.cloud.yolov5) based on [Yolov5-based docker](https://github.com/ultralytics/yolov5/blob/master/Dockerfile)
 
 [Containers: nvidia:pytorch](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch/layers)
+https://github.com/ultralytics/yolov5/issues/58
 
-[TODO] fix warning 
+- [TODO] fix warning 
 NOTE: MOFED driver for multi-node communication was not detected.
       Multi-node communication performance may be reduced.
-[TODO] --runttime nvidia vs --gpus all
+- [TODO] --runttime nvidia vs --gpus all
 
 Build Docker 
 ```
