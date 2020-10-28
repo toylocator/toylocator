@@ -1,7 +1,7 @@
 
 # Training On AWS Cloud
 
-#### System 
+#### System Requirements 
 - file storag: s3 vs EFS
 	- EFS cannot be mounted on NX (does it matter?)
 	- can s3 mounted everywhere? (s3fs)
@@ -48,43 +48,59 @@ Start on-demand instance for Nvidia image (better image for docker)
 aws ec2 run-instances --image-id ami-0384cb16509f0e03b --instance-type g4dn.2xlarge --associate-public-ip-address --key-name cal-ec2-west2
 ```
 
-ami-050717f7d89c1247b
+#### Setup
+![Dockerfile](Dockerfile.cloud.yolov5) based on [Yolov5-based docker](https://github.com/ultralytics/yolov5/blob/master/Dockerfile)
+
+[TODO] fix warning 
+NOTE: MOFED driver for multi-node communication was not detected.
+      Multi-node communication performance may be reduced.
+[TODO] --runttime nvidia vs --gpus all
+
+Build Docker 
+```
+docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
+
+# CD to toylocator repo before starting the docker
+git clone https://github.com/taeil/toylocator.git
+cd toylocator 
+
+docker run --ipc=host --name toylocator --rm --privileged --gpus all -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5cloud
+
+# sanity check 
+python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
+```
+
+Training 
+```
+# (optional) smoke run for training 
+python3 train.py --img 416 --batch 4 --epochs 5 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+
+# full training  
+python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+
+# save models 
+cp -f runs/exp1_yolov5s_results/weights/last.pt /data
+cp -f runs/exp1_yolov5s_results/weights/best.pt /data
+
+# inference on test images 
+python3 detect.py --weights /data/best.pt --img 416 --conf 0.4 --source /data/5_toys.v2.yolov5pytorch/test/images
+
+# verify the result (optional)
+jupyter lab --ip=0.0.0.0 --no-browser
+```
 
 
-
+#### Other Things Tried But Did Not Work 
 Using [Yolov5 docker](https://github.com/ultralytics/yolov5/wiki/Docker-Quickstart) 
+This does not work. Some issue maybe related to pytorch version compatibility. 
 ```
 sudo docker pull ultralytics/yolov5:latest
 sudo docker run --ipc=host --gpus all -it ultralytics/yolov5:latest
 sudo docker run --ipc=host --runtime nvidia --gpus all -it ultralytics/yolov5:latest
-```
 
-Building [Yolov5-based docker](https://github.com/ultralytics/yolov5/blob/master/Dockerfile)
+docker run --name toylocator --rm --privileged --gpus all --runtime nvidia -v $PWD/data:/usr/src/app/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5cloud
 
-
-SSH into the system
-```
-jupyter notebook --ip=0.0.0.0 --no-browser
-```
-
-
-To run yolov5 docker, 
-```
-# CD to toylocator repo before starting the docker
-
-docker run --name toylocator --rm --privileged --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti ultralytics/yolov5
-
-```
-
-To train
-```
-# I removed --cache parameter in case. 
-
-# optino 1
-python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results 
-
-# option 2
-python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --cache
+sudo docker run --ipc=host --gpus all -p 8888:8888 -p 6006:6006 -it ultralytics/yolov5:latest
 
 ```
 
