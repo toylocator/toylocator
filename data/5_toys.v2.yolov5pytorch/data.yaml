@@ -1,5 +1,5 @@
-train: /data/5_toys.v2.yolov5pytorch/train/images
-val: /data/5_toys.v2.yolov5pytorch/valid/images
+train: ../train/images
+val: ../valid/images
 
 nc: 5
 names: ['black monster truck', 'brontosaurus', 'lego fire truck', 'yellow dump truck', 'yellow mini cooper']

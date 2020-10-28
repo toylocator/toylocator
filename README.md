@@ -64,27 +64,6 @@ Explore the following options
 1. Pre-trained model ([TODO imagenet], yolov5, [TODO googlenet])
 2. Train model and test 
 
-To run yolov5 docker, 
-```
-# CD to toylocator repo before starting the docker
-
-docker run -e DISPLAY=$DISPLAY --name toylocator --rm --privileged --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
-
-```
-
-To train
-```
-# I removed --cache parameter in case. 
-
-# optino 1
-python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results 
-
-# option 2
-python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/5_toys.v2.yolov5pytorch/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --cache
-
-```
-
-
 #### 5. Inference 
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
