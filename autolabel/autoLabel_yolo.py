@@ -14,7 +14,7 @@ Reads images from raw data directory and prepares Yolo structure.
 rawImage_dir = './rawImages'
 
 # Create yolo folder structure - images folder
-img_dir = ['./train/images', '.validate/images']
+img_dir = ['./train/images', './validate/images']
 for dir in img_dir:
     if not os.path.exists(dir):
         os.makedirs(dir)
