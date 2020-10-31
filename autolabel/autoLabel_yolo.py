@@ -42,9 +42,10 @@ def datasetSplit(img_lst):
         - img_list: list of images
     """
     num = len(img_lst)
-    msk = np.random.rand(num) < 0.8  # 80/20 split
-    train_lst = np.array(img_lst)[msk]
-    validation_lst = np.array(img_lst)[~msk]
+
+    idx = np.random.permutation(num)
+    train_lst = np.array(img_lst)[idx[:int(num * .8)]]   # 80/20 split
+    validation_lst = np.array(img_lst)[idx[:int(num * .2)]]
     return train_lst, validation_lst
 
 def convert(size=(800, 600), box=(107.0, 694.0, 106.0, 493.0)):
