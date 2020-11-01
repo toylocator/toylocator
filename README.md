@@ -1,4 +1,7 @@
-# Toy Locator
+Toy Locator
+==============================
+
+Deep Learning application to locate a toy at a household
 
 ## PoC 
 PoC was done on week 9 (Oct. 24th) with the following simplificiation. 
@@ -131,3 +134,5 @@ python3 detect.py --source 1 --weights /toy_pt/best_v1026_5toys.pt --conf 0.4
 #### Future Work 
 - incremental training 
 - googlenet
+
+<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
