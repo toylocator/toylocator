@@ -8,20 +8,28 @@ cap = cv.VideoCapture(0)
 cap.set(cv.CAP_PROP_FRAME_WIDTH, 680)
 cap.set(cv.CAP_PROP_FRAME_HEIGHT, 680)
 
+# directry to output latest_label.txt file and raw images 
+PATH = '../../data/raw/'
+
 # placeholder for object class
 if len(sys.argv) == 1:
     print("Please enter the name for the object.")
     exit()
 
-object = str(sys.argv[1])
+obj = str(sys.argv[1])
 
 # create data folder for output frames
-output_path = '../../data/raw/{}/'.format(object)
+output_path = PATH + obj
 if not os.path.exists(output_path):
     os.makedirs(output_path)
 else:
     print("An obejct with the same name exists; please use a different name and try again:)")
     exit()
+
+# write the class name to latest_label.txt
+txt_file_path = PATH + 'latest_label.txt'
+with open(txt_file_path, 'w') as file:
+    file.write(obj)
 
 # Preparation countdown
 countdown = 110
@@ -43,7 +51,7 @@ while(True):
     else:
         color = (255, 223, 0)
         frame = cv.rectangle(frame, (x, y), (x + w, y + h), color, 5)
-        cv.imwrite(output_path+"/"+object+"_"+str(i)+".jpg",frame)
+        cv.imwrite(output_path+"/"+obj+"_"+str(i)+".jpg",frame)
         i += 1
 
     cv.imshow('output_', frame)
