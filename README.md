@@ -45,8 +45,10 @@ ffmpeg -i video/IMG_xxxx.MOV -frames:v 100 -r 2 images/toy_xxxx%03d.jpg
 	1. label new images 
 	2. [TODO] merge with existing classes.txt and update class ID
 	3. [TODO] validate label and image sizes
-2. Augment annotated images
-	1.  [TODO] augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
+2. pre-processing images 
+	1. [TODO] Resize to similar to camera 
+	2. Augment annotated images
+		1.  [TODO] augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
 
 #### 3. Automatic label
 Manual labelling images is not feasible options for actual real life scenario. 
@@ -54,21 +56,22 @@ Explore the following options
 - [TODO] option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
 - [TODO] option 2. segmentation, automatically label. (potentially publishable)  
 - [TODO] further research on automatic labelling 
+- [TODO test option 1 of dataset creation how well it performs without labeling] 
 
 #### 4. Training the model 
-[TODO train on nx taeil has OOM, chenlin has syntax error, hongsuk has catch up to do.] 
-[TODO can we train incrementally?] 
 - ***input***: dataset
 - ***output***: models (best.pt) 
-- [TODO test option 1 of dataset creation how well it performs without labeling] 
-1. Pre-trained model ([TODO imagenet], yolov5, [TODO googlenet])
+1. Pre-trained model (yolov5)
 2. Train model and test 
+3. [TODO] training with single command
+4. [TODO] use data from s3 bucket 
 
 #### 5. Inference 
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 - ***input***: image of scene, live feed from camera 
 - ***input***: object name (e.g., blue dump truck)
+- ***input***: trained models 
 - ***output***: rectangular on the image or display
 [TODO source camera] 
 [TODO test more with different test images (rooms)] 
@@ -123,3 +126,8 @@ python3 detect.py --source 1 --weights /toy_pt/best_v1026_5toys.pt --conf 0.4
 > Leo: Thanks Toy Locator. 
 >
 > Toy Locator: You are welcome. 
+
+
+#### Future Work 
+- incremental training 
+- googlenet
