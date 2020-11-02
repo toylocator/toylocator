@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>videoplayback1790.jpg</filename>
+	<path>/Users/Chenlin/Dropbox/UCBerkeley/Courses/W251_Deep_Learning_Edge/Homework/annotation/data/MIDS_HW8/images/videoplayback1790.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1000</width>
+		<height>563</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Millennium Falcon</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>57</xmin>
+			<ymin>183</ymin>
+			<xmax>930</xmax>
+			<ymax>427</ymax>
+		</bndbox>
+	</object>
+</annotation>
