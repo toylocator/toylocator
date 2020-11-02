@@ -5,22 +5,57 @@ import xml.etree.ElementTree as ET
 from os import listdir, getcwd
 from os.path import join
 import numpy as np
+import sys
 
 """
 Reads images from raw data directory and prepares Yolo structure.
 """
 
-# raw image outputs from camera; input for auto-labeling
-rawImage_dir = './rawImages'
+input_path = '../../data/raw/'
+output = '../../data/processed/'
+
+# Read in latest class label from latest_label.txt
+txt_file_path = input_path + 'latest_label.txt'
+with open(txt_file_path, 'r') as file:
+    obj = file.read()
+
+# Append class label to existing inventory
+inventory_path = output + 'label_inventory.txt'
 
 # Create yolo folder structure - images folder
-img_dir = ['./train/images', './validate/images']
+train_img_output_path = output + 'train/images/'
+validate_img_output_path = output + 'validate/images/'
+
+img_dir = [train_img_output_path, validate_img_output_path]
 for dir in img_dir:
     if not os.path.exists(dir):
         os.makedirs(dir)
 
+# Check if class label exists in inventory already
+# If exits, inform and exit
+# If not, proceed with appending the class label
+try:
+    with open(inventory_path, 'r+') as file:
+        temp_set = set(file.read().splitlines())
+        if obj in temp_set:
+            print("We had annotated this object already:)")
+        # If class label does not exit in inventory list, append to list
+        else:
+            file.write(obj + '\n')
+
+# If inventory list does not exist, create one and append class label
+except:
+    with open(inventory_path, 'a') as file:
+        file.write(obj + '\n')
+
+# Read in inventory list to classes
+with open(inventory_path, 'r') as file:
+    classes = file.read().splitlines()
+
+# raw image outputs from camera; input for auto-labeling
+rawImage_dir = '../../data/raw/{}/'.format(obj)
+
 dirs = ['train', 'validate']
-classes = ['iphone x']  # [TODO] Swap for user input  [TODO] will read in existing classes
 
 # Function to obtain a list of .jpg images in directory
 def getImagesInDir(dir_path):
@@ -84,12 +119,11 @@ def annotate(output_path, image_path):
 
     out_file = open(output_path + basename_no_ext + '.txt', 'w')   # write .txt file with same file name
     bb = convert()
-    cls = 'iphone x'  # [TODO] This needs to be swapped from user-input
+    cls = obj
     cls_id = classes.index(cls)  # [TODO] This classes will be read in from .txt file at beginning
     out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
 
 # Execution
-cwd = getcwd()
 image_paths = getImagesInDir(rawImage_dir)
 train_paths, validation_paths = datasetSplit(image_paths)
 image_sets = [train_paths, validation_paths]
@@ -97,7 +131,7 @@ image_sets = [train_paths, validation_paths]
 for i, image_paths in enumerate(image_sets):
 
     # output path to be either {$PWD}/train or {$PWD}/validate
-    full_dir_path = cwd + '/' + dirs[i]
+    full_dir_path = output + dirs[i]
 
     # output path in the labels folder
     output_path = full_dir_path + '/labels/'
@@ -116,11 +150,11 @@ for i, image_paths in enumerate(image_sets):
 
 num_train = len(train_paths)
 num_validate = len(validation_paths)
-print("Processed {} training and {} validation".format(num_train, num_validate))
-
+# print("Processed {} training and {} validation".format(num_train, num_validate))
+print("Process completed")
 
 """
-Orignal .xml specs for our camera frame
+Orignal .xml specs for our camera frame for reference
 <object>
 	<name>iphone x</name>
 	<pose>Unspecified</pose>
