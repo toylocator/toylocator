@@ -1,6 +1,19 @@
+## Manual Label
+1. Manually label the images using [labelImg](https://github.com/tzutalin/labelImg))
+	1. label new images 
+	2. [TODO] merge with existing classes.txt and update class ID
+	3. [TODO] validate label and image sizes
+2. pre-processing images 
 
+## Automatic label
+Manual labelling images is not feasible options for actual real life scenario. 
+Explore the following options 
+- [TODO] option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
+- [TODO] option 2. segmentation, automatically label. (potentially publishable)  
+- [TODO] further research on automatic labelling 
+- [TODO test option 1 of dataset creation how well it performs without labeling] 
 
-## Object tracking
+#### Object tracking
 We tried multiple appraoches described below and found 3rd approach as the most suitable approach. 
 
 - approach 1: motion tracking lab (lab3) (dynamic background comparing to previous snap shot)
@@ -45,6 +58,5 @@ s3fs toylocator data/processed
 -o url="https://s3-us-west-2.amazonaws.com"
 
 ```
-
 
 
