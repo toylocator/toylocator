@@ -1,6 +1,6 @@
 #### Setup Instructions
 - [Training on AWS Cloud](training_on_aws.md)
-- [Motion detector setup](object%20tracking)
+- [Motion detector setup](annotation)
 
 #### Trasfer Learning 
 - [On-device machine learning: TensorFlow on Android (Google Cloud Next '17)](https://www.youtube.com/watch?v=EnFyneRScQ8&feature=youtu.be&t=4m17s&ab_channel=GoogleCloudPlatform)
@@ -12,6 +12,7 @@
 - [251 week 1 lab](https://github.com/MIDS-scaling-up/v2/tree/master/week01/lab)
 - [terminology: Object detection vs object recognition vs segmentation](https://www.kaggle.com/getting-started/169984) 
 - catastrophic forgetting 
+- [DeepSORT object tracking](https://nanonets.com/blog/object-tracking-deepsort/)
 
 #### Training dataset
 - [w251/week08](https://github.com/MIDS-scaling-up/v2/tree/master/week08)
