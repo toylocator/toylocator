@@ -3,73 +3,48 @@ Toy Locator
 
 Deep Learning application to locate a toy at a household
 
-## PoC 
-PoC was done on week 9 (Oct. 24th) with the following simplificiation. 
-1. Take video of 5 toys (mobile phone)
-2. Convert to images ([ffmpeg](https://ffmpeg.org/) )
-3. Label the images ([labelImg](https://github.com/tzutalin/labelImg))
-4. Augment the images (Roboflow)
-5. Split train/valid/test dataset (Roboflow)
-6. Train the custom object detection model (Colab)
-7. Run inference on test dataset (Colab and NX)
-
-![](references/flow.png) (source: https://roboflow.com/)
 
 ## overall architecture / flow 
+1. Collect: images from camera 
+2. Label: automaticallly with the minimum input by the user (select area at the beginning and enter the name)
+4. Process: 
+5. Train: 
+6. Deploy: Download the model on the device and detect the object real time
+7. Display
+	1. Show on the screen the location of the specific object 
+	2. Announce the location of the toy
 
-#### all with Jetson Xavier NX
+#### Training on an Edge Device With Manual Labeling
 ![](references/overall_arch.png)
 
-#### Training on Cloud
+#### Training on Cloud With Auto-labelling
 ![](references/overall_arch_cloud.png)
 
-[TODO] convert to docker-compose to simply NX deployments
-[TODO] automotically trigger all of the processing and download the model automatically in xx mins
-
 ## (Toy Registration) creating (additional) dataset
-- ***input***: video
-- ***output***: datasets for a single object
-- simplification: mobile phone -> nx camera -> raw input video file
 
-#### 1. Collect Video 
-Capture a video using mobile phone
-[TODO] Capture a video using a camera using NX (modifiy detect.py)
-[TODO] add guideline to camera view
+#### 1. Collect and Label Images from camera 
+- ***input***: webcam
+- ***output***: labelled images 
+- Using Deep SORT mechanism to track the image once labelled. 
+- See more on [different approaches to annotate toys](annotation)
 
-#### 2. Convert Images ([ffmpeg](https://ffmpeg.org/) )
-Convert videos to images 
-```
-ffmpeg -i video/IMG_xxxx.MOV -frames:v 100 -r 2 images/toy_xxxx%03d.jpg
-```
+#### 2. Process Images
+- ***input***: labelled images 
+- ***output***: dataset
+ augment, split dataset and creat data.yaml 
+1. Resize to similar to camera 
+2. Augment annotated images
+	1.  augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
 
-#### 3. Preparing Training Datasets
- [TODO] replace roboflow usages for augmentation, splitting dataset and creating data.yaml creation! 
-1. Manually label the images using [labelImg](https://github.com/tzutalin/labelImg))
-	1. label new images 
-	2. [TODO] merge with existing classes.txt and update class ID
-	3. [TODO] validate label and image sizes
-2. pre-processing images 
-	1. [TODO] Resize to similar to camera 
-	2. Augment annotated images
-		1.  [TODO] augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
-
-#### 3. Automatic label
-Manual labelling images is not feasible options for actual real life scenario. 
-Explore the following options 
-- [TODO] option 1. convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
-- [TODO] option 2. segmentation, automatically label. (potentially publishable)  
-- [TODO] further research on automatic labelling 
-- [TODO test option 1 of dataset creation how well it performs without labeling] 
-
-#### 4. Training the model 
+#### 3. Train the model 
 - ***input***: dataset
 - ***output***: models (best.pt) 
-1. Pre-trained model (yolov5)
-2. Train model and test 
+1. Pre-trained model (e.g., yolov5)
+2. Train model and test (determine if the model is good enough to be distributed
 3. [TODO] training with single command
 4. [TODO] use data from s3 bucket 
 
-#### 5. Inference 
+#### 4. Inference 
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 - ***input***: image of scene, live feed from camera 
@@ -98,11 +73,6 @@ python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
 python3 detect.py --source 1 --weights /toy_pt/best_v1026_5toys.pt --conf 0.4
 
 ```
-
-#### 6. Broker / cloud 
-- (depends on the possibility of incremental training)
-- training happens in the central place where all the training dataset is kept. 
-
 
 ## Problem 
 
