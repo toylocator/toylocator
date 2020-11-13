@@ -15,11 +15,16 @@ input_path = '../../data/raw/'
 output = '../../data/processed/'
 
 # Read in latest class label from latest_label.txt
-txt_file_path = input_path + 'latest_label.txt'
-with open(txt_file_path, 'r') as file:
+txt_label_file_path = input_path + 'latest_label.txt'
+with open(txt_label_file_path, 'r') as file:
     obj = file.read()
 
-# Append class label to existing inventory
+# Read in a list of bbox dimensions from raw images
+txt_dim_file_path = input_path + obj + '/bbox.txt'
+with open(txt_dim_file_path, 'r') as file:
+    bbox = file.read().splitlines()
+
+# Master inventory list
 inventory_path = output + 'label_inventory.txt'
 
 # Create yolo folder structure - images folder
@@ -83,42 +88,38 @@ def datasetSplit(img_lst):
     validation_lst = np.array(img_lst)[idx[:int(num * .2)]]
     return train_lst, validation_lst
 
-def convert(size=(800, 600), box=(107.0, 694.0, 106.0, 493.0)):
+def convert(size, box):
     """
-    Function to generate YOLO bbox parameters. The dimensions are hard-coded
-    since our bounding box is fixed. We won't need this function in production.
-    parameters:
+    Function to generate YOLO bbox parameters.
+    Parameters:
         - size: tuple containing width and height of raw image
-        - b: tuple containing bounding box xmin, ymin, xmax, ymax
+        - box: tuple containing bounding box x, y, w, h
     """
     dw = 1./(size[0])   # 1 / image width
     dh = 1./(size[1])   # 1 / image height
 
-    x = (box[0] + box[1])/2.0 - 1
-    y = (box[2] + box[3])/2.0 - 1
-    w = box[1] - box[0]
-    h = box[3] - box[2]
-    x = x*dw
+    x, y, w, h = box[0], box[1], box[2], box[3]
+    x = (x + w/2.0) * dw
     w = w*dw
-    y = y*dh
+    y = (y + h/2.0) * dh
     h = h*dh
-
     return (x,y,w,h)
 
 
-def annotate(output_path, image_path):
+def annotate(output_path, image_path, size, bbox):
     """
     Main function to create the annotation .txt files.
     parameters:
-        - dir_path: directory of training or validation images
         - output_path: destination for annotated .txt files
         - image_path: directory to individual image
+        - size: tuple containing width and height of raw image
+        - bbox: a tuple (x, y, w, h) with bbox dimensions from raw image
     """
     basename = os.path.basename(image_path)  # extract file name only
     basename_no_ext = os.path.splitext(basename)[0]   # extract file name without extension
 
     out_file = open(output_path + basename_no_ext + '.txt', 'w')   # write .txt file with same file name
-    bb = convert()
+    bb = convert(size, bbox)   ############
     cls = obj
     cls_id = classes.index(cls)  # [TODO] This classes will be read in from .txt file at beginning
     out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
@@ -144,9 +145,11 @@ for i, image_paths in enumerate(image_sets):
     for file in image_paths:
         shutil.copy(file, full_dir_path + '/images')
 
-    # generate annotation files to labels folder
-    for path in image_paths:
-        annotate(output_path, path)
+    # generate annotation files and save to labels folder
+    for n, path in enumerate(image_paths):
+        bbox_float = [float(dim) for dim in bbox[n].split()]
+        annotate(output_path, path, (640, 480), bbox_float)
+
 
 num_train = len(train_paths)
 num_validate = len(validation_paths)
