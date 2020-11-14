@@ -120,6 +120,12 @@ cp -f runs/train/yolov5s/weights/best.pt /data
 aws s3 sync . s3://your/bucket/address/data/
 ```
 
+- Grab trained models from S3 and moved them to the directory where detect.py is located
+```
+aws s3 cp s3://your/bucket/address/data/best.pt .
+aws s3 cp s3://your/bucket/address/data/last.pt .
+```
+
 
 - Inference
 - I connected usb cam to mac, so the source is 1
