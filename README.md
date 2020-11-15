@@ -45,14 +45,13 @@ Deep Learning application to locate a toy at a household
 See more on [training on the AWS](training)
 
 #### 4. Inference 
-- simplification: live video -> image of scene 
-- testing prep: manually label objects from scenes
-- ***input***: image of scene, live feed from camera 
+- ***input***: live feed from camera 
 - ***input***: object name (e.g., blue dump truck)
 - ***input***: trained models 
 - ***output***: rectangular on the image or display
 - See more on [inference from images or camera](inferences)
-
+- simplification: live video -> image of scene 
+- testing prep: manually label objects from scenes
 
 ## Problem 
 
@@ -64,7 +63,7 @@ See more on [training on the AWS](training)
 >
 > Dad: Honey, have you seen my key?
 >
-> Mom: You ask everyday. Can you put it next to the door where it should be? 
+> Mom: You ask everyday. Can you put it in the bowl next to the entrace where it should be? 
 >
 > Dad: That is not the answer I was looking for. 
 >
@@ -76,13 +75,16 @@ See more on [training on the AWS](training)
 >
 > Toy Locator: The blue Ironman is at bedroom number 2 right below the red chair on the left side of the room.
 >
-> Leo: Thanks Toy Locator. 
+> Leo: Thanks Toy Locator!
 >
-> Toy Locator: You are welcome. 
+> Toy Locator: You are welcome! 
 
 
-#### Future Work 
-- incremental training 
-- googlenet
+#### Challenge
+- autolabel
+- 3 dimensional objects
+- incremental training (catastropic forgetting)
+- training on edge device 
+- 
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
