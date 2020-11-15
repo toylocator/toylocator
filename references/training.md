@@ -80,16 +80,3 @@ cp -f runs/expx_xxx /data
 cp -f runs/expx_xxx /data
 ```
 
-Transfer trained weights from EC2 to S3
-- exit the container `exit`
-- change S3 bucket address accordingly
-```
-aws s3 sync . s3://path/to/data/
-```
-
-Inference
-- start NX container
-- change source accordingly to be file path or camera
-```
-python3 detect.py --weights /data/best.pt --img 416 --conf 0.4 --source /data/test/images
-```

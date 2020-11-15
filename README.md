@@ -6,8 +6,8 @@ Deep Learning application to locate a toy at a household
 
 ## overall architecture / flow 
 1. Collect: images from camera 
-2. Label: automaticallly with the minimum input by the user (select area at the beginning and enter the name)
-4. Process: 
+2. Label: automaticallly with the minimum input by the user (select area at the beginning and enter the name) with yolov5 format
+4. Process: augmentation 
 5. Train: 
 6. Deploy: Download the model on the device and detect the object real time
 7. Display
@@ -35,14 +35,14 @@ Deep Learning application to locate a toy at a household
 1. Resize to similar to camera 
 2. Augment annotated images
 	1.  augment (rotate, noise, flip, etc) images using [image_augmentor](https://github.com/codebox/image_augmentor)
+	2.  handling annotation during the processing images :question:
 
 #### 3. Train the model 
 - ***input***: dataset
 - ***output***: models (best.pt) 
 1. Pre-trained model (e.g., yolov5)
 2. Train model and test (determine if the model is good enough to be distributed
-3. [TODO] training with single command
-4. [TODO] use data from s3 bucket 
+See more on [training on the AWS](training)
 
 #### 4. Inference 
 - simplification: live video -> image of scene 
@@ -51,28 +51,8 @@ Deep Learning application to locate a toy at a household
 - ***input***: object name (e.g., blue dump truck)
 - ***input***: trained models 
 - ***output***: rectangular on the image or display
-[TODO source camera] 
-[TODO test more with different test images (rooms)] 
+- See more on [inference from images or camera](inferences)
 
-To run inference on test dataset
-```
-!python3 detect.py --weights toy/modeling/pretrained/best_v1024_5toys.pt --img 416 --conf 0.4 --source "toy/data/4 toys.v2.yolov5pytorch/test/images"
-```
-
-To run inference on the camera, 
-```
-# must run this command on NX terminal (not SSH)
-xhost +
-
-docker run --name toylocator --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v $PWD/modeling/pretrained:/toy_pt -v $PWD/data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
-
-# generic detection for sanity check (please change to 0)
-python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
-
-# run toy detection with camera (please change to 0)
-python3 detect.py --source 1 --weights /toy_pt/best_v1026_5toys.pt --conf 0.4
-
-```
 
 ## Problem 
 
