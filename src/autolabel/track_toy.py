@@ -10,9 +10,9 @@ if len(sys.argv) < 2:
 
 source = 0
 if len(sys.argv) == 3:
-    source = str(sys.argv[2])
+    source = int(sys.argv[2])
 
-obj = int(sys.argv[1])
+obj = str(sys.argv[1])
 
 cap = cv.VideoCapture(source)
 cap.set(3, 640)
