@@ -15,16 +15,11 @@ input_path = '../../data/raw/'
 output = '../../data/processed/'
 
 # Read in latest class label from latest_label.txt
-txt_label_file_path = input_path + 'latest_label.txt'
-with open(txt_label_file_path, 'r') as file:
+txt_file_path = input_path + 'latest_label.txt'
+with open(txt_file_path, 'r') as file:
     obj = file.read()
 
-# Read in a list of bbox dimensions from raw images
-txt_dim_file_path = input_path + obj + '/bbox.txt'
-with open(txt_dim_file_path, 'r') as file:
-    bbox = file.read().splitlines()
-
-# Master inventory list
+# Append class label to existing inventory
 inventory_path = output + 'label_inventory.txt'
 
 # Create yolo folder structure - images folder
@@ -88,41 +83,57 @@ def datasetSplit(img_lst):
     validation_lst = np.array(img_lst)[idx[:int(num * .2)]]
     return train_lst, validation_lst
 
-def convert(size, box):
+def convert(size=(640, 480)):
     """
     Function to generate YOLO bbox parameters.
-    Parameters:
-        - size: tuple containing width and height of raw image
-        - box: tuple containing bounding box x, y, w, h
+    size: tuple containing width and height of raw image
     """
+
+    image_paths = getImagesInDir(rawImage_dir)    
+
     dw = 1./(size[0])   # 1 / image width
     dh = 1./(size[1])   # 1 / image height
 
-    x, y, w, h = box[0], box[1], box[2], box[3]
-    x = (x + w/2.0) * dw
-    w = w*dw
-    y = (y + h/2.0) * dh
-    h = h*dh
-    return (x,y,w,h)
+    
+    # Read in bbox coordinate information from bbox_information.txt
+    bbox_path = input_path + 'bbox_information.txt'
+    with open(bbox_path, 'r') as file:
+        content = file.read().splitlines()
+        dimension_list = []
+        for n in content:
+            x = int(n.split()[0])+int(n.split()[2])/2
+            y = int(n.split()[1])+int(n.split()[3])/2
+            w = int(n.split()[2])
+            h = int(n.split()[3])
+            
+            x = x*dw
+            w = w*dw
+            y = y*dh
+            h = h*dh
+          
+            dimension_list.append((x,y,w,h))
+
+    return dimension_list
 
 
-def annotate(output_path, image_path, size, bbox):
+def annotate(output_path, image_path):
     """
     Main function to create the annotation .txt files.
     parameters:
+        - dir_path: directory of training or validation images
         - output_path: destination for annotated .txt files
         - image_path: directory to individual image
-        - size: tuple containing width and height of raw image
-        - bbox: a tuple (x, y, w, h) with bbox dimensions from raw image
     """
     basename = os.path.basename(image_path)  # extract file name only
     basename_no_ext = os.path.splitext(basename)[0]   # extract file name without extension
 
     out_file = open(output_path + basename_no_ext + '.txt', 'w')   # write .txt file with same file name
-    bb = convert(size, bbox)   ############
+    bb = convert()
     cls = obj
-    cls_id = classes.index(cls)  # [TODO] This classes will be read in from .txt file at beginning
-    out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+    cls_id = classes.index(cls)
+    for item in bb:
+        if int(basename_no_ext.split('_')[1]) == bb.index(item):
+            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in item]) + '\n')
 
 # Execution
 image_paths = getImagesInDir(rawImage_dir)
@@ -145,29 +156,11 @@ for i, image_paths in enumerate(image_sets):
     for file in image_paths:
         shutil.copy(file, full_dir_path + '/images')
 
-    # generate annotation files and save to labels folder
-    for n, path in enumerate(image_paths):
-        bbox_float = [float(dim) for dim in bbox[n].split()]
-        annotate(output_path, path, (640, 480), bbox_float)
-
+    # generate annotation files to labels folder
+    for path in image_paths:
+        annotate(output_path, path)
 
 num_train = len(train_paths)
 num_validate = len(validation_paths)
 # print("Processed {} training and {} validation".format(num_train, num_validate))
 print("Process completed")
-
-"""
-Orignal .xml specs for our camera frame for reference
-<object>
-	<name>iphone x</name>
-	<pose>Unspecified</pose>
-	<truncated>0</truncated>
-	<difficult>0</difficult>
-	<bndbox>
-		<xmin>107</xmin>
-		<ymin>106</ymin>
-		<xmax>694</xmax>
-		<ymax>493</ymax>
-	</bndbox>
-</object>
-"""
