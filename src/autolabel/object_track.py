@@ -10,12 +10,12 @@ if len(sys.argv) < 2:
 
 source = 0
 if len(sys.argv) == 3:
-    source = str(sys.argv[2])
+    source = int(sys.argv[2])
 
 obj = str(sys.argv[1])
 
 cap = cv.VideoCapture(source)
-time.sleep(5)
+#time.sleep(10)
 cap.set(3, 640)
 cap.set(4, 480)
 
