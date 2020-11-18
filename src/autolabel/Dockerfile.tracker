@@ -24,7 +24,9 @@ RUN pip3 install -U gsutil pyyaml tqdm cython torchvision paho-mqtt
 #exract opencv on /usrlib
 #
 #
-COPY my-opencv-4.3.0.tar.gz /usr/lib
+
+RUN wget -nv https://github.com/toylocator/toylocator/releases/download/251-opencv/my-opencv-4.3.0.tar.gz -P /usr/lib
+#COPY my-opencv-4.3.0.tar.gz /usr/lib
 RUN tar -zxvf /usr/lib/my-opencv-4.3.0.tar.gz -C /usr/lib
 
 ENV PYTHONPATH /usr/lib/opencv-4.3.0/release/python_loader
