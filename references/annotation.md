@@ -24,16 +24,11 @@ The following options are considered and selected the approach tracking an objec
 	- Cons:
 	- Pros:  
 		- opencv-contrib-python: ([not supporting arm64](https://forums.developer.nvidia.com/t/how-to-install-opencv-contrib-python-on-xavier/76549) Need to build a package for ARM devices. See[building opencv-contrib-python on NX](build_opencv-contrib-python) for the workaround
-	```
-	sudo docker run --user $(id -u):$(cut -d: -f3 < <(getent group video)) --runtime nvidia -it --rm mdegans/tegra-opencv:latest
-
-	docker run --name tracker --privileged -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app --runtime nvidia -it --rm mdegans/tegra-opencv:latest 
-	```
 1. (approach 5) convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
 	- Cons:
 	- Pros:  
 
-#### Object Tracker 
+#### Object Tracker (approach 4)
 ```
 docker build -t tracker -f Dockerfile.tracker .
 
