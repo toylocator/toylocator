@@ -32,12 +32,16 @@ The following options are considered and selected the approach tracking an objec
 ```
 docker build -t tracker -f Dockerfile.tracker .
 
-docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -ti tracker 
+docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -p 8888:8888 -ti tracker 
 
 python3 object_track.py <toy name> 0 
 
-#python3 annotation.py
+python3 annotation.py
+
 ```
+
+#### Validate Labelled Images 
+Use the `validate_yolov5_dataset` jupyter noebook. 
 
 #### pre-processing images
 `WIP`
