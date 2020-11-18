@@ -13,9 +13,10 @@ WORKDIR /usr/src/app
 #RUN pip install -r requirements.txt
 
 
+# standard package for opencv libopencv-dev python3-opencv
 RUN apt-get update && \ 
     apt-get install -y libffi-dev python3-pip curl unzip python3-tk \ 
-		libgtk2.0-0 libopencv-dev python3-opencv \ 
+		libgtk2.0-0 \ 
 		python3-scipy python3-matplotlib python3-numpy  
 RUN pip3 install -U gsutil pyyaml tqdm cython torchvision paho-mqtt  
 #RUN pip3 install git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
@@ -27,7 +28,7 @@ RUN pip3 install -U gsutil pyyaml tqdm cython torchvision paho-mqtt
 
 RUN wget -nv https://github.com/toylocator/toylocator/releases/download/251-opencv/my-opencv-4.3.0.tar.gz -P /usr/lib
 #COPY my-opencv-4.3.0.tar.gz /usr/lib
-RUN tar -zxvf /usr/lib/my-opencv-4.3.0.tar.gz -C /usr/lib
+RUN tar -zxf /usr/lib/my-opencv-4.3.0.tar.gz -C /usr/lib
 
 ENV PYTHONPATH /usr/lib/opencv-4.3.0/release/python_loader
 #COPY cam_capture.py /run
