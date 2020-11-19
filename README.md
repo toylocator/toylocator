@@ -21,7 +21,7 @@ Deep Learning application to locate a toy at a household
 
 ![](references/overall_arch_cloud.png)
 
-## (Toy Registration) creating (additional) dataset
+## :sleepy: (Toy Registration) creating (additional) dataset
 
 #### 1. Collect and Label Images from camera 
 - ***input***: webcam
@@ -54,7 +54,7 @@ See more on [training on the AWS](training)
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 
-## Problem 
+## :baby: Problem 
 
 > Leo (4 years old): Mommy, have you seen my spiderman?
 >
