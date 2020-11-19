@@ -55,7 +55,7 @@ def drawBbox(frame, bbox):
     cv.rectangle(frame, (x, y), ((x + w), (y+h)), (255, 0, 0), 2, 1)
 
 i = 0
-while True:
+while i < 1000:
     # read frame
     ret, frame = cap.read()
     # get bbox and updates tracker
@@ -72,7 +72,7 @@ while True:
     
     ##### ADD IMAGE CAPTURE and annotation CODE HERE ######
     #######################################################
-    cv.imwrite(output_path+"/"+obj+"_"+str(i)+".jpg",frame)
+    cv.imwrite(f"{output_path}/{obj}_{i:03}.jpg", frame)
     i += 1    
     
     # append the bbox coordinate to bbox_information.txt
@@ -80,7 +80,6 @@ while True:
     bbox_path = PATH + 'bbox_information.txt'
     with open(bbox_path, 'a') as file:
         file.write(" ".join([str(a) for a in bbox_coordinate]) + '\n')
-
 
     #######################################################
     cv.imshow('tracking', frame)

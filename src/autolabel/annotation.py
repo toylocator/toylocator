@@ -1,9 +1,9 @@
 import glob, shutil
 import os
-import pickle
-import xml.etree.ElementTree as ET
-from os import listdir, getcwd
-from os.path import join
+#import pickle
+#import xml.etree.ElementTree as ET
+#from os import listdir, getcwd
+#from os.path import join
 import numpy as np
 import sys
 
@@ -17,7 +17,7 @@ output = '../../data/processed/'
 # Read in latest class label from latest_label.txt
 txt_file_path = input_path + 'latest_label.txt'
 with open(txt_file_path, 'r') as file:
-    obj = file.read()
+    cls = file.read()
 
 # Append class label to existing inventory
 inventory_path = output + 'label_inventory.txt'
@@ -37,28 +37,30 @@ for dir in img_dir:
 try:
     with open(inventory_path, 'r+') as file:
         temp_set = set(file.read().splitlines())
-        if obj in temp_set:
+        if cls in temp_set:
             print("We had annotated this object already:)")
         # If class label does not exit in inventory list, append to list
         else:
-            file.write(obj + '\n')
+            file.write(cls + '\n')
 
 # If inventory list does not exist, create one and append class label
 except:
+    print("some exception")
     with open(inventory_path, 'a') as file:
-        file.write(obj + '\n')
+        file.write(cls + '\n')
 
 # Read in inventory list to classes
 with open(inventory_path, 'r') as file:
     classes = file.read().splitlines()
 
 # raw image outputs from camera; input for auto-labeling
-rawImage_dir = '../../data/raw/{}/'.format(obj)
+rawImage_dir = '../../data/raw/{}/'.format(cls)
 
 dirs = ['train', 'validate']
 
+
 # Function to obtain a list of .jpg images in directory
-def getImagesInDir(dir_path):
+def get_lists_in_dir(dir_path):
     """
     Function to obtain a list of .jpg files in a directory.
     Parameters:
@@ -70,7 +72,8 @@ def getImagesInDir(dir_path):
         image_list.append(filename)
     return image_list
 
-def datasetSplit(img_lst):
+
+def split_datasets(img_lst):
     """
     Function to split the image_list to training/validation sets.
     Parameters:
@@ -83,18 +86,18 @@ def datasetSplit(img_lst):
     validation_lst = np.array(img_lst)[idx[:int(num * .2)]]
     return train_lst, validation_lst
 
-def convert(size=(640, 480)):
+
+def read_annotation_yolov5(size=(640, 480)):
     """
     Function to generate YOLO bbox parameters.
     size: tuple containing width and height of raw image
     """
 
-    image_paths = getImagesInDir(rawImage_dir)    
+    # image_paths = get_lists_in_dir(rawImage_dir)
 
     dw = 1./(size[0])   # 1 / image width
     dh = 1./(size[1])   # 1 / image height
 
-    
     # Read in bbox coordinate information from bbox_information.txt
     bbox_path = input_path + 'bbox_information.txt'
     with open(bbox_path, 'r') as file:
@@ -116,28 +119,28 @@ def convert(size=(640, 480)):
     return dimension_list
 
 
-def annotate(output_path, image_path):
+def generate_annotation(target, images):
     """
     Main function to create the annotation .txt files.
     parameters:
-        - dir_path: directory of training or validation images
-        - output_path: destination for annotated .txt files
-        - image_path: directory to individual image
+        - target: destination for annotated .txt files
+        - images: paths to the images
     """
-    basename = os.path.basename(image_path)  # extract file name only
-    basename_no_ext = os.path.splitext(basename)[0]   # extract file name without extension
+    bb = read_annotation_yolov5()
+    for path in images:
+        basename = os.path.basename(path)  # extract file name only (e.g., bear_013.jpg)
+        basename_no_ext = os.path.splitext(basename)[0]   # extract file name (e.g., bear_013)
 
-    out_file = open(output_path + basename_no_ext + '.txt', 'w')   # write .txt file with same file name
-    bb = convert()
-    cls = obj
-    cls_id = classes.index(cls)
-    for item in bb:
-        if int(basename_no_ext.split('_')[1]) == bb.index(item):
-            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in item]) + '\n')
+        label_filepath = target + basename_no_ext + '.txt'
+        with open(label_filepath, 'w') as out_file:   # a label file is same as corresponding image file name
+            cls_id = classes.index(cls)
+            item = bb[int(basename_no_ext.split('_')[1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
+            out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
 
-# Execution
-image_paths = getImagesInDir(rawImage_dir)
-train_paths, validation_paths = datasetSplit(image_paths)
+
+# execution entry point
+# image_dirs =
+train_paths, validation_paths = split_datasets(get_lists_in_dir(rawImage_dir))
 image_sets = [train_paths, validation_paths]
 
 for i, image_paths in enumerate(image_sets):
@@ -157,8 +160,8 @@ for i, image_paths in enumerate(image_sets):
         shutil.copy(file, full_dir_path + '/images')
 
     # generate annotation files to labels folder
-    for path in image_paths:
-        annotate(output_path, path)
+    generate_annotation(output_path, image_paths)
+
 
 num_train = len(train_paths)
 num_validate = len(validation_paths)
