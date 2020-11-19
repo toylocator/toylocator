@@ -72,7 +72,6 @@ def get_lists_in_dir(dir_path):
         image_list.append(filename)
     return image_list
 
-
 def split_datasets(img_lst):
     """
     Function to split the image_list to training/validation sets.
@@ -99,9 +98,9 @@ def read_annotation_yolov5(size=(640, 480)):
     dh = 1./(size[1])   # 1 / image height
 
     # Read in bbox coordinate information from bbox_information.txt
-    bbox_path = input_path + 'bbox_information.txt'
-    with open(bbox_path, 'r') as file:
-        content = file.read().splitlines()
+    bbox_path = input_path + cls + '_annotations.txt'
+    with open(bbox_path, 'r') as annotation_file:
+        content = annotation_file.read().splitlines()
         dimension_list = []
         for n in content:
             x = int(n.split()[0])+int(n.split()[2])/2
@@ -114,7 +113,7 @@ def read_annotation_yolov5(size=(640, 480)):
             y = y*dh
             h = h*dh
           
-            dimension_list.append((x,y,w,h))
+            dimension_list.append((x, y, w, h))
 
     return dimension_list
 
