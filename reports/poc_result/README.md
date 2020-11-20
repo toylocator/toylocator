@@ -10,6 +10,9 @@ PoC was done on week 9 (Oct. 24th) with the following simplificiation.
 
 ![](references/flow.png) (source: https://roboflow.com/)
 
+#### Training on an Edge Device With Manual Labeling
+![](references/overall_arch.png)
+
 ## v1026 Test Result
 
 #### change comparing to v1024

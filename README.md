@@ -3,8 +3,13 @@ Toy Locator
 
 Deep Learning application to locate a toy at a household
 
+## :fearful: Challenge 
+- labelling automatically
+- detecting 3 dimensional objects (computer vision, object detection)
+- incremental training (overcoming catastropic forgetting)
+- training on edge device (minimum computing resources)
 
-## overall architecture / flow 
+## :weary: Overall Architecture / Flow 
 1. Collect: images from camera 
 2. Label: automaticallly with the minimum input by the user (select area at the beginning and enter the name) with yolov5 format
 4. Process: augmentation 
@@ -14,13 +19,9 @@ Deep Learning application to locate a toy at a household
 	1. Show on the screen the location of the specific object 
 	2. Announce the location of the toy
 
-#### Training on an Edge Device With Manual Labeling
-![](references/overall_arch.png)
-
-#### Training on Cloud With Auto-labelling
 ![](references/overall_arch_cloud.png)
 
-## (Toy Registration) creating (additional) dataset
+## :sleepy: (Toy Registration) creating (additional) dataset
 
 #### 1. Collect and Label Images from camera 
 - ***input***: webcam
@@ -53,7 +54,7 @@ See more on [training on the AWS](training)
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 
-## Problem 
+## :baby: Problem 
 
 > Leo (4 years old): Mommy, have you seen my spiderman?
 >
@@ -80,11 +81,6 @@ See more on [training on the AWS](training)
 > Toy Locator: You are welcome! 
 
 
-#### Challenge
-- autolabel
-- 3 dimensional objects
-- incremental training (catastropic forgetting)
-- training on edge device 
-- 
+
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
