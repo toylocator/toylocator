@@ -5,21 +5,6 @@ import random
 import glob
 import os
 
-raw_path = "../../data/raw/"
-input_path = "../../data/augmented/"
-
-txt_file_path = raw_path + 'latest_label.txt'
-with open(txt_file_path, 'r') as file:
-    obj = file.read()
-
-rawImage_dir = '../../data/raw/{}/'.format(obj)
-augImage_dir = '../../data/augmented/{}/'.format(obj)
-
-if not os.path.exists(augImage_dir):
-    os.makedirs(augImage_dir)
-else:
-    print("An obejct with the same name exists; please use a different name and try again:)")
-    exit()
 
 def get_lists_in_dir(dir_path):
     """
@@ -33,8 +18,6 @@ def get_lists_in_dir(dir_path):
         image_list.append(filename)
     return image_list
 
-image_paths = get_lists_in_dir(rawImage_dir)
-image_list = os.listdir(rawImage_dir)
 
 def rotate_image(image, angle, bb):
     
@@ -59,6 +42,7 @@ def rotate_image(image, angle, bb):
     
     return rotated_image, new_boundingbox
 
+
 def width_shift_image(image, width_shift_range, bb):
     
     img_width, img_height = 640, 480
@@ -74,6 +58,7 @@ def width_shift_image(image, width_shift_range, bb):
     new_boundingbox = [shifted_point_A[0].astype(int), shifted_point_A[1].astype(int), shifted_point_C[0].astype(int), shifted_point_C[1].astype(int) ]
     
     return shifted_image, new_boundingbox
+
 
 def height_shift_image( image, height_shift_range, bb):
     
@@ -115,6 +100,7 @@ def scale_image(image, scale_factor, bb):
       
     return scaled_img, new_boundingbox
 
+
 def sp_noise(image,prob):
     '''
     Add salt and pepper noise to image
@@ -133,7 +119,48 @@ def sp_noise(image,prob):
                 output[i][j] = image[i][j]
     return output
 
-bbox_path = raw_path + obj + '_annotations.txt'
+
+def save_image_with_annotation(img, bb, cls, img_idx):
+    """
+    helper funtion: write an augmented image and annotation file
+    img: image to save
+    bb: bounding box information
+    cls: object class
+    img_idx: unique image numbers for the class
+    """
+    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)
+    cv2.imwrite(f"{data_path}/augmented/{cls}/{cls}_aug_{img_idx:04}.jpg", img)
+
+    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
+    aug_bbox_path = data_path + 'augmented/aug_bbox_information.txt'
+    with open(aug_bbox_path, 'a') as file:
+        file.write(f"{int(bb[0])} {int(bb[1])} {int(bb[2]) - int(bb[0])} {int(bb[3]) - int(bb[1])}")
+
+    # TODO handle failure when image writing was successful while label was not.
+
+    return img_idx
+
+
+# execution entry point
+data_path = "../../data"
+
+with open(f"{data_path}/raw/latest_label.txt", 'r') as file:
+    cls = file.read()
+
+rawImage_dir = f"{data_path}/raw/{cls}/"
+augImage_dir = f"{data_path}/augmented/{cls}/"
+
+if not os.path.exists(augImage_dir):
+    os.makedirs(augImage_dir)
+else:
+    print("An object with the same name exists; please use a different name and try again :)")
+    exit()
+
+image_paths = get_lists_in_dir(rawImage_dir)
+image_list = os.listdir(rawImage_dir)
+
+bbox_path = f"{data_path}/raw/{cls}_annotations.txt"
+
 with open(bbox_path, 'r') as file:
     content = file.read().splitlines()
     dimension_list = []
@@ -143,114 +170,37 @@ with open(bbox_path, 'r') as file:
         x2 = int(n.split()[0]) + int(n.split()[2])
         y2 = int(n.split()[1]) + int(n.split()[3])
         
-        dimension_list.append([x1,y1,x2,y2])
+        dimension_list.append([x1, y1, x2, y2])
 
-i = 0
+img_idx = 0
 for n in range(len(image_paths)):
     original_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-    img, bb = rotate_image(original_image, 30, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-       
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    aug_bbox_path = input_path + 'aug_bbox_information.txt'
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
 
-    img, bb = rotate_image(original_image, 60, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-    
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
+    rotation_angles = [30, 60, 90]
+    shifts = [0.2, 0.4]
+    scales = [.5, 1.5]
 
-    img, bb = rotate_image(original_image, 90, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
+    for angle in rotation_angles:
+        img, bb = rotate_image(original_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
+    for ratio in shifts:
+        img, bb = width_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    img, bb = width_shift_image(original_image, 0.2, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-    img, bb = width_shift_image(original_image, 0.4, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-    
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-    img, bb = height_shift_image(original_image, 0.2, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
- 
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-    img, bb = height_shift_image(original_image, 0.4, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
+        img, bb = height_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
     img, bb = horizontal_flip(original_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
+    img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
+    for scale in scales:
+        img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    img, bb = scale_image(original_image, 0.5, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-    img, bb = scale_image(original_image, 1.5, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]) , (255, 0, 0), 2, 1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-    img = sp_noise(original_image,0.1)
-    cv2.imwrite(input_path+obj+"/"+obj+"_"+"aug"+"_"+str(i)+".jpg", img)
-    i += 1
-
-    aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    with open(aug_bbox_path, 'a') as file:
-        file.write(" ".join([str(a) for a in aug_bbox]) + '\n')
-
-
-
-
+    img = sp_noise(original_image, 0.1)
+    img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
 
