@@ -54,7 +54,10 @@ Use the `validate_yolov5_dataset` jupyter noebook.
 ```
 cd src/autolabel 
 sudo rm -rf ../../data/augmented/
-python3 augmentation.py
+sudo rm -rf ../../data/processed/
+ 
+# rotate shift scale noise are optional but at least one of them needs to be specified 
+python3 augmentation.py rotate shift scale noise 
 
 # (optional) confirm the number of files and annotation 
 ls -l ../../data/augmented/<class name> | wc -l
