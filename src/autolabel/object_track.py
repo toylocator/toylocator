@@ -10,6 +10,7 @@ def drawBbox(frame, bbox):
     x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
     cv.rectangle(frame, (x, y), ((x + w), (y+h)), (255, 0, 0), 2, 1)
 
+
 # placeholder for object class
 if len(sys.argv) < 2:
     print("Please enter the name for the object.")
@@ -22,7 +23,7 @@ if len(sys.argv) == 3:
 cls = str(sys.argv[1])
 
 cap = cv.VideoCapture(source)
-#time.sleep(10)
+# time.sleep(10)
 cap.set(3, 640)
 cap.set(4, 480)
 

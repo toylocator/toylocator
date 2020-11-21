@@ -3,6 +3,7 @@ import cv2
 import random
 import glob
 import os
+import sys
 
 
 def get_lists_in_dir(dir_path):
@@ -141,6 +142,11 @@ def save_image_with_annotation(img, bb, cls, img_idx):
 
 
 # execution entry point
+
+if len(sys.argv) < 2:
+    print("At least one augmentation type should be defined.\n e.g., python3 augmentation.py rotate flip shift scale noise")
+    exit()
+
 data_path = "../../data"
 
 with open(os.path.join(data_path, "raw", "latest_label.txt"), 'r') as file:
@@ -154,6 +160,25 @@ if not os.path.exists(augImage_dir):
 else:
     print("An object with the same name exists; please use a different name and try again :)")
     exit()
+
+rotation_angles = []
+shifts = []
+scales = []
+noises = []
+flip = False
+
+for i in range(1, len(sys.argv)):
+    aug_type = str(sys.argv[i])
+    if aug_type == "rotate":
+        rotation_angles = [30, 60, 90]
+    if aug_type == "shift":
+        shifts = [0.2, 0.4]
+    if aug_type == "scale":
+        scales = [.5, 1.5]
+    if aug_type == "noise":
+        noises = [0.1]
+    if aug_type == "flip":
+        flip = True
 
 image_paths = get_lists_in_dir(rawImage_dir)
 image_list = os.listdir(rawImage_dir)
@@ -176,10 +201,6 @@ for n in range(len(image_paths)):
     original_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
-    rotation_angles = [30, 60, 90]
-    shifts = [0.2, 0.4]
-    scales = [.5, 1.5]
-
     for angle in rotation_angles:
         img, bb = rotate_image(original_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
@@ -191,15 +212,18 @@ for n in range(len(image_paths)):
         img, bb = height_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    img, bb = horizontal_flip(original_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-    img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+    if flip:
+        img, bb = horizontal_flip(original_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
     for scale in scales:
         img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    # img = sp_noise(original_image, 0.1)
-    img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+    for noise in noises:
+        img = sp_noise(original_image, noise)
+        bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
+        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
 

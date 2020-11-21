@@ -176,7 +176,6 @@ def aug_generate_annotation(target, aug_images):
 
 
 # execution entry point
-
 image_paths = get_lists_in_dir(rawImage_dir)
 train_paths, validation_paths = split_datasets(image_paths)
 image_sets = [train_paths, validation_paths]
