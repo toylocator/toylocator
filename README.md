@@ -43,7 +43,7 @@ Deep Learning application to locate a toy at a household
 - ***output***: models (best.pt) 
 1. Pre-trained model (e.g., yolov5)
 2. Train model and test (determine if the model is good enough to be distributed
-See more on [training on the AWS](training)
+See more on [training on the AWS](training_on_aws_stepbystep)
 
 #### 4. Inference 
 - ***input***: live feed from camera 
