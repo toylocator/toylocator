@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import utils as u
 import random
 import glob
 import os
@@ -129,26 +128,26 @@ def save_image_with_annotation(img, bb, cls, img_idx):
     img_idx: unique image numbers for the class
     """
     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)
-    cv2.imwrite(f"{data_path}/augmented/{cls}/{cls}_aug_{img_idx:04}.jpg", img)
+    cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{img_idx:04}.jpg"), img)
 
     aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
-    aug_bbox_path = data_path + 'augmented/aug_bbox_information.txt'
+    aug_bbox_path = os.path.join(data_path, 'augmented', 'aug_bbox_information.txt')
     with open(aug_bbox_path, 'a') as file:
-        file.write(f"{int(bb[0])} {int(bb[1])} {int(bb[2]) - int(bb[0])} {int(bb[3]) - int(bb[1])}")
+        file.write(f"{int(bb[0])} {int(bb[1])} {int(bb[2]) - int(bb[0])} {int(bb[3]) - int(bb[1])}\n")
 
     # TODO handle failure when image writing was successful while label was not.
 
-    return img_idx
+    return img_idx + 1
 
 
 # execution entry point
 data_path = "../../data"
 
-with open(f"{data_path}/raw/latest_label.txt", 'r') as file:
+with open(os.path.join(data_path, "raw", "latest_label.txt"), 'r') as file:
     cls = file.read()
 
-rawImage_dir = f"{data_path}/raw/{cls}/"
-augImage_dir = f"{data_path}/augmented/{cls}/"
+rawImage_dir = os.path.join(data_path, "raw", cls)
+augImage_dir = os.path.join(data_path, "augmented", cls)
 
 if not os.path.exists(augImage_dir):
     os.makedirs(augImage_dir)
@@ -159,7 +158,7 @@ else:
 image_paths = get_lists_in_dir(rawImage_dir)
 image_list = os.listdir(rawImage_dir)
 
-bbox_path = f"{data_path}/raw/{cls}_annotations.txt"
+bbox_path = os.path.join(data_path, "raw", f"{cls}_annotations.txt")
 
 with open(bbox_path, 'r') as file:
     content = file.read().splitlines()
@@ -199,7 +198,7 @@ for n in range(len(image_paths)):
         img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    img = sp_noise(original_image, 0.1)
+    # img = sp_noise(original_image, 0.1)
     img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
