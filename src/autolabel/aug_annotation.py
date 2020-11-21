@@ -175,8 +175,6 @@ def aug_generate_annotation(target, aug_images):
             out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
 
 
-
-
 # execution entry point
 
 image_paths = get_lists_in_dir(rawImage_dir)

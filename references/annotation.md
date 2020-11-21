@@ -51,7 +51,18 @@ python3 annotation.py
 Use the `validate_yolov5_dataset` jupyter noebook. 
 
 #### pre-processing images
-`WIP`
+```
+cd src/autolabel 
+sudo rm -rf ../../data/augmented/
+python3 augmentation.py
+
+# (optional) confirm the number of files and annotation 
+ls -l ../../data/augmented/<class name> | wc -l
+wc -l ../../data/augmented/<class name>_bbox_information.txt
+# 1st one should be 1 bigger. 
+
+```
+
 
 #### Upload annotated dataset
 `WIP`
