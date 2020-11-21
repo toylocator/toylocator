@@ -220,9 +220,10 @@ for n in range(len(image_paths)):
         img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-    for noise in noises:
-        img = sp_noise(original_image, noise)
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+    # (TODO) need to get bb information from
+    # for noise in noises:
+    #     img = sp_noise(original_image, noise)
+    #     img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
 
