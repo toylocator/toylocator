@@ -57,12 +57,15 @@ sudo rm -rf ../../data/augmented/
 sudo rm -rf ../../data/processed/
  
 # rotate shift scale noise are optional but at least one of them needs to be specified 
-python3 augmentation.py rotate shift scale noise 
+python3 augmentation.py rotate shift scale flip noise 
 
 # (optional) confirm the number of files and annotation 
+# for output, 1st one should be 1 bigger. 
 ls -l ../../data/augmented/<class name> | wc -l
-wc -l ../../data/augmented/<class name>_bbox_information.txt
-# 1st one should be 1 bigger. 
+wc -l ../../data/augmented/aug_bbox_information.txt
+
+# convert annotation format
+python3 aug_annotation.py 
 
 ```
 
