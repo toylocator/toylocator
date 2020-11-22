@@ -43,12 +43,13 @@ docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e D
 
 python3 object_track.py <toy name> 0 
 
-python3 annotation.py
+# skip the following 
+# python3 annotation.py
 
 ```
 
-#### Validate Labelled Images 
-Use the `validate_yolov5_dataset` jupyter noebook. 
+#### (optional) Validate Labelled Images 
+Use the ` ` jupyter noebook. 
 
 #### pre-processing images
 ```

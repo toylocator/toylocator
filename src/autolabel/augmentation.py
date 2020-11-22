@@ -96,7 +96,12 @@ def scale_image(image, scale_factor, bb):
     
     scaled_img = cv2.resize(image, (width,height))
 
-    new_boundingbox = [np.float32((img_width-bb[2])*scale_factor), np.float32(bb[1]*scale_factor), np.float32((img_width-bb[0])*scale_factor), np.float32(bb[3]*scale_factor)]
+    # TODO not working (horizontal flip effect0
+    # new_boundingbox = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
+    #                    np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
+    # review the following code (works)
+    new_boundingbox = [np.float32((img_width-bb[2])*scale_factor), np.float32(bb[1]*scale_factor),
+                       np.float32((img_width-bb[0])*scale_factor), np.float32(bb[3]*scale_factor)]
       
     return scaled_img, new_boundingbox
 
@@ -222,6 +227,7 @@ for n in range(len(image_paths)):
 
     for noise in noises:
         img = sp_noise(original_image, noise)
+        # bear_001.jpg
         bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
         img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 

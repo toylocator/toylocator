@@ -1,6 +1,6 @@
 #### Setup Instructions
-- [Training on AWS Cloud](training_on_aws.md)
-- [Motion detector setup](annotation)
+- [Annotation using object tracking](annotation)
+- [Training on AWS](training_on_aws.md)
 
 #### Trasfer Learning 
 - [On-device machine learning: TensorFlow on Android (Google Cloud Next '17)](https://www.youtube.com/watch?v=EnFyneRScQ8&feature=youtu.be&t=4m17s&ab_channel=GoogleCloudPlatform)
@@ -29,3 +29,7 @@
 - [Learning Deep Neural Networks Incrementally](https://medium.com/heuritech/learning-deep-neural-networks-incrementally-3e005e4fb4bc)
 - [Pseudo-Rehearsal learning](https://arxiv.org/abs/1705.08690)
 - [Lifelong Learning with DEN](https://arxiv.org/abs/1708.01547)
+
+#### Inference on Edge devices 
+- [tensorflow lite/examples](https://github.com/tensorflow/examples/tree/master/lite)
+- [Raspberry Pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) 
