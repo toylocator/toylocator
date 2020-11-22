@@ -90,7 +90,6 @@ def horizontal_flip(img, bb):
 def scale_image(image, scale_factor, bb):
 
     img_width, img_height = 640, 480
-    orig_x = bb[0]
 
     width = int(scale_factor * img_width)
     height = int(scale_factor * img_height)
@@ -98,8 +97,8 @@ def scale_image(image, scale_factor, bb):
     scaled_img = cv2.resize(image, (width,height))
 
     # TODO not working (horizontal flip effect0
-    new_boundingbox = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
-                       np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
+    # new_boundingbox = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
+    #                    np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
     # review the following code (works)
     new_boundingbox = [np.float32((img_width-bb[2])*scale_factor), np.float32(bb[1]*scale_factor),
                        np.float32((img_width-bb[0])*scale_factor), np.float32(bb[3]*scale_factor)]
