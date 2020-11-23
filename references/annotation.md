@@ -42,16 +42,20 @@ The following options are considered and selected the approach tracking an objec
 
 docker build -t tracker -f Dockerfile.tracker .
 
-docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
+# mount git repo via -v 
+docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
+
+# git clone 
+docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -ti tracker
 
 # inside of the docker
 python3 object_track.py <toy name> 0 
 ```
 
 #### (optional) Validate Labelled Images 
-Use the jupyter noebook. 
+Use the jupyter noebook.  
 
-#### pre-processing images and upload 
+#### Pre-processing Images and Upload to Dataset Repository  
 Run shell script
 ```
 ./gen_push_dataset.sh
