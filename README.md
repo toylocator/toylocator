@@ -21,6 +21,18 @@ Deep Learning application to locate a toy at a household
 
 ![](references/overall_arch_cloud.png)
 
+#### Dataset Repository 
+```
+s3://toylocator 
+    ├── data
+    │   ├── train       
+    │   ├── validate        
+    │   └── label_inventory.txt      <- The latest label list 
+	├── model
+    │   ├── best.pt   <- use for inference        
+    └───└── mmdd    <- contained the models and logs trained on mm/dd
+```
+
 ## :sleepy: (Toy Registration) creating (additional) dataset
 
 #### 1. Collect and Label Images from camera 
