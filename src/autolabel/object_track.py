@@ -56,8 +56,8 @@ with open(txt_file_path, 'w') as file:
 cap = cv.VideoCapture(source)
 
 # time.sleep(10)
-#cap.set(3, 640)
-#cap.set(4, 480)
+cap.set(3, 640)
+cap.set(4, 480)
 
 tracker = cv.TrackerCSRT_create()
 # tracker = cv.TrackerMOSSE_create()

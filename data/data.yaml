@@ -1,4 +1,4 @@
 names: [default]
 nc: 1
-train: ../../data/processed/train/images
-val: ../../data/processed/validate/images
+train: /data/train/images
+val: /data/validate/images
