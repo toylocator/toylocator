@@ -25,6 +25,10 @@ WORKDIR /usr/src/app/yolov5
 #RUN pip3 install -U gsutil pyyaml tqdm cython torchvision
 #RUN apt install -y python3-scipy python3-matplotlib python3-numpy
 
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+RUN unzip awscliv2.zip
+RUN ./aws/install
 # Copy weights
 #RUN python3 -c "from models import *; \
 #attempt_download('weights/yolov5s.pt'); \
