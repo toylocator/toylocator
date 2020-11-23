@@ -37,9 +37,13 @@ The following options are considered and selected the approach tracking an objec
 
 #### Object Tracker (approach 4)
 ```
+
+# configure to have access to s3 where dataset will be uploaded
+# access key and secret key for s3://toylocator should be provided
+
 docker build -t tracker -f Dockerfile.tracker .
 
-docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -p 8888:8888 -ti tracker 
+docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
 
 python3 object_track.py <toy name> 0 
 
@@ -66,11 +70,16 @@ ls -l ../../data/augmented/<class name> | wc -l
 wc -l ../../data/augmented/aug_bbox_information.txt
 
 # convert annotation format
+
+aws s3 cp s3://toylocator/latest_inventory.txt ../../data
+
 python3 aug_annotation.py 
 
 ```
 
-
 #### Upload annotated dataset
-`WIP`
+
+```
+aws s3 cp /data/processed s3://toylocator/upload --recursive 
+```
 

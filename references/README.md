@@ -10,6 +10,7 @@
 - [yolov5 docker](https://github.com/ultralytics/yolov5/wiki/Docker-Quickstart)
 - [YOLOv5 Tutorial](https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb#scrollTo=VUOiNLtMP5aG) 
 - [yolov5 format end-to-end](https://towardsdatascience.com/how-to-create-an-end-to-end-object-detector-using-yolov5-35fbb1a02810)
+- [yolov5 custom dataset](https://blog.roboflow.com/how-to-train-yolov5-on-a-custom-dataset/)
 - [251 week 1 lab](https://github.com/MIDS-scaling-up/v2/tree/master/week01/lab)
 - [terminology: Object detection vs object recognition vs segmentation](https://www.kaggle.com/getting-started/169984) 
 - catastrophic forgetting 
