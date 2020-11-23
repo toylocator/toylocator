@@ -26,7 +26,9 @@ Deep Learning application to locate a toy at a household
 s3://toylocator 
     ├── data
     │   ├── train       
-    │   ├── validate        
+    │   ├── validate    
+    │   ├── data.yaml    
+    │   ├── custom_yolov5s.yaml    
     │   └── label_inventory.txt      <- The latest label list 
 	├── model
     │   ├── best.pt   <- use for inference        

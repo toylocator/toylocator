@@ -1,0 +1,16 @@
+version: '3.2'
+services:
+  yolov5cloud:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloud.yolov5
+    privileged: true
+    stdin_open: true
+    tty: true
+    ports:
+      - "8888:8888"
+      - "6006:6006"
+    volumes:
+      - $HOME/.aws:/root/.aws:rw
+      - /tmp:/tmp
+    command: /bin/sh -c /train_yolov5_model.sh

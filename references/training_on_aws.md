@@ -45,11 +45,6 @@ docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
 # CD to toylocator repo before starting the docker
 git clone https://github.com/toylocator/toylocator.git
 cd toylocator 
-
-docker run --ipc=host --name toylocator --rm --privileged --gpus all -v $PWD/data:/data -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti yolov5cloud
-
-# sanity check (optional)
-# python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
 ```
 
 #### Copy Dataset and Create Yolov5 YAML (WIP)
@@ -57,17 +52,22 @@ docker run --ipc=host --name toylocator --rm --privileged --gpus all -v $PWD/dat
 2. (cloud) mount efs or s3 or both and update yaml files
 3. train 
 
-
-2. Copy data from S3 bucket
-```
-aws s3 cp s3:/toylocator/data /data --recursive
-```
-
 3. run shell scriyamlpt to update data.yaml, update yolov5s.
 
 #### Training 
 Train and verify the result 
 ```
+docker run --ipc=host --name toylocator --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti yolov5cloud
+```
+
+train_yolov5_model.sh
+```
+# Copy data from S3 bucket
+aws s3 cp s3://toylocator/data /data --recursive
+
+# sanity check (optional)
+# python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
+
 # (optional) smoke run for training 
 python3 train.py --img 416 --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
@@ -84,6 +84,7 @@ python3 detect.py --weights /data/best.pt --img 416 --conf 0.4 --source /data/5_
 # verify the result (optional)
 jupyter lab --ip=0.0.0.0 --no-browser
 ```
+
 
 Grab trained models from S3 and moved them to the directory where detect.py is located
 ```
