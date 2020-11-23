@@ -71,15 +71,17 @@ wc -l ../../data/augmented/aug_bbox_information.txt
 
 # convert annotation format
 
-aws s3 cp s3://toylocator/latest_inventory.txt ../../data
+aws s3 cp s3://toylocator/data/label_inventory.txt ../../data/label_inventory.txt
 
 python3 aug_annotation.py 
 
 ```
 
-#### Upload annotated dataset
+#### Upload annotated dataset and update label_inventory
 
 ```
-aws s3 cp /data/processed s3://toylocator/upload --recursive 
+aws s3 cp data/processed/train s3://toylocator/data/train --recursive
+aws s3 cp data/processed/validate s3://toylocator/data/validate --recursive
+aws s3 cp data/processed/label_inventory.txt s3://toylocator/data/label_inventory.txt
 ```
 
