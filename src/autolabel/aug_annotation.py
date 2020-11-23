@@ -14,6 +14,7 @@ Reads images from raw data directory and prepares Yolo structure.
 input_path = '../../data/raw/'
 aug_path = '../../data/augmented/'
 output = '../../data/processed/'
+data_path = '../../data/'
 
 # Read in latest class label from latest_label.txt
 txt_file_path = input_path + 'latest_label.txt'
@@ -21,7 +22,7 @@ with open(txt_file_path, 'r') as file:
     cls = file.read()
 
 # Append class label to existing inventory
-inventory_path = output + 'label_inventory.txt'
+inventory_path = os.path.join(data_path, 'label_inventory.txt')
 
 # Create yolo folder structure - images folder
 train_img_output_path = output + 'train/images/'

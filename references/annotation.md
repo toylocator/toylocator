@@ -37,40 +37,23 @@ The following options are considered and selected the approach tracking an objec
 
 #### Object Tracker (approach 4)
 ```
+# configure to have access to s3 where dataset will be uploaded
+# access key and secret key for s3://toylocator should be provided
+
 docker build -t tracker -f Dockerfile.tracker .
 
-docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -p 8888:8888 -ti tracker 
+docker run --name tracker --privileged --runtime nvidia --rm -v /data:/data -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
 
+# inside of the docker
 python3 object_track.py <toy name> 0 
-
-# skip the following 
-# python3 annotation.py
-
 ```
 
 #### (optional) Validate Labelled Images 
-Use the ` ` jupyter noebook. 
+Use the jupyter noebook. 
 
-#### pre-processing images
+#### pre-processing images and upload 
+Run shell script
 ```
-cd src/autolabel 
-sudo rm -rf ../../data/augmented/
-sudo rm -rf ../../data/processed/
- 
-# rotate shift scale noise are optional but at least one of them needs to be specified 
-python3 augmentation.py rotate shift scale flip noise 
-
-# (optional) confirm the number of files and annotation 
-# for output, 1st one should be 1 bigger. 
-ls -l ../../data/augmented/<class name> | wc -l
-wc -l ../../data/augmented/aug_bbox_information.txt
-
-# convert annotation format
-python3 aug_annotation.py 
-
+./gen_push_dataset.sh
 ```
-
-
-#### Upload annotated dataset
-`WIP`
 
