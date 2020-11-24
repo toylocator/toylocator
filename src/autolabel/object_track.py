@@ -16,16 +16,26 @@ if len(sys.argv) < 2:
     print("Please enter the name for the object.")
     exit()
 
+use_pi_cam = False
 source = 0
-if len(sys.argv) == 3:
+if len(sys.argv) >= 3:
     source = int(sys.argv[2])
+
+for i in range(1, len(sys.argv)):
+    optional_param = str(sys.argv[i])
+    if optional_param == "picam":
+        use_pi_cam = True
 
 cls = str(sys.argv[1])
 
-cap = cv.VideoCapture(source)
-# time.sleep(10)
-cap.set(3, 640)
-cap.set(4, 480)
+# override source if raspberry camera
+if use_pi_cam:
+    print("---\nraspberri camera\n----")
+    source = f"nvarguscamerasrc sensor-id={source} ! video/x-raw(memory:NVMM), width=3820," \
+             " height=2464, framerate=21/1, format=NV12 !" \
+             " nvvidconv flip-method=2 !" \
+             " video/x-raw, width=800, height=600, format=BGRx !" \
+             " videoconvert ! video/x-raw, format=BGR ! appsink"
 
 # directry to output latest_label.txt file and raw images
 raw_data_dir = '../../data/raw/'
@@ -43,16 +53,23 @@ txt_file_path = raw_data_dir + 'latest_label.txt'
 with open(txt_file_path, 'w') as file:
     file.write(cls)
 
-# tracker = cv.TrackerMOSSE_create()
+cap = cv.VideoCapture(source)
+
+# time.sleep(10)
+cap.set(3, 640)
+cap.set(4, 480)
+
 tracker = cv.TrackerCSRT_create()
+# tracker = cv.TrackerMOSSE_create()
 # tracker = cv.TrackerGOTURN_create()
+
 # read initial frame for customized bounding box
 ret, frame = cap.read()
 bbox = cv.selectROI('Tracking', frame, False)
 initial_txt = 'Please draw a bounding box'
 cv.putText(frame, initial_txt, (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
 
-# initialzie tracker using the bounding box
+# initialize tracker using the bounding box
 tracker.init(frame, bbox)
 
 # timestamps used for fps calculation
@@ -88,7 +105,7 @@ while True:
     headline_txt = f'Capturing training samples...'
     fpd_txt = f'Camera feed @ ~{fps} fps'
     status_txt = f'Collection Status: {collected_num}/{target_sample_num}'
-
+    
     cv.putText(frame, headline_txt, (30, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
     cv.putText(frame, fpd_txt, (30, 40), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
     cv.putText(frame, status_txt, (30, 60), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
