@@ -60,7 +60,7 @@ docker run --ipc=host --name toylocator --rm --privileged --gpus all -v $PWD/dat
 
 2. Copy data from S3 bucket
 ```
-aws s3 cp s3:/toylocator/data /data --recursive
+aws s3 cp s3://toylocator/data /data --recursive
 ```
 
 3. run shell scriyamlpt to update data.yaml, update yolov5s.
