@@ -74,6 +74,17 @@ train_yolov5_model.sh (for debugging only)
 # Copy data from S3 bucket
 aws s3 cp s3://toylocator/data /data --recursive
 
+# generate data.yaml and custom_yolov5s.yaml 
+nc=$(cat /data/label_inventory.txt | wc -l)
+mv /data/data.yaml /data/data.template
+echo "names: [default]" > /data/data.yaml
+echo "nc: $nc" >> /data/data.yaml
+sed 1,2d /data/data.template >> /data/data.yaml
+mv /data/custom_yolov5s.yaml /data/custom_yolov5s.template
+echo "names: # parameters" > /data/custom_yolov5s.yaml
+echo "nc: $nc" >> /data/custom_yolov5s.yaml
+sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
+
 # sanity check (optional)
 # python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
 
@@ -83,26 +94,18 @@ python3 train.py --img 416 --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /
 # full training  
 python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
-# inference on test images 
-cp -f runs/exp0_yolov5s_results/weights/last.pt /data
-cp -f runs/exp0_yolov5s_results/weights/best.pt /data
-python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/5_toys.v2.yolov5pytorch/test/images
+# inference on test images (optional)
+cp -f runs/train/yolov5s_results/weights/last.pt /data
+cp -f runs/train/yolov5s_results/weights/best.pt /data
+python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images
 
+# upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/exp0_yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/exp0_yolov5s_results s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/yolov5s_results s3://toylocator/model/$model_dir --recursive
 
 # verify the result (optional)
 # jupyter lab --ip=0.0.0.0 --no-browser
-```
-
-
-Grab trained models from S3 and moved them to the directory where detect.py is located
-```
-# aws s3 cp s3://toylocator/model/best.pt .
-aws s3 cp runs/exp0_yolov5s_results/weights/last.pt s3://toylocator/model/1122/last.pt 
-aws s3 cp <any log to keep> s3://toylocator/model/1122 --recursive 
-
 ```
 
 #### Other Things That Was Not Working
