@@ -33,57 +33,69 @@ aws ec2 run-instances --image-id <AMI ID> --instance-type <either p3 or g4 insta
 
 ```
 
-Build docker image  
+Using Docker-Compose  
+- [install awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install)
 ```
 # if missing, install awscli 
 # sudo apt install -y awscli 
 aws configure
 # enter access key and secret key for s3://toylocator 
 
-docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
-
 # CD to toylocator repo before starting the docker
 git clone https://github.com/toylocator/toylocator.git
 cd toylocator 
+```
 
-docker run --ipc=host --name toylocator --rm --privileged --gpus all -v $PWD/data:/data -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti yolov5cloud
+Using Docker-Compose
+- [install docker-compose](https://docs.docker.com/compose/install/) 
+```
+# sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" > ~/docker-compose
+# chmod +x ~/docker-compose 
+# sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+cd ~/toylocator/model
+
+# use the following command only if needs to rebuild with fresh docker image 
+# docker-compose build --no-cache
+docker-compose up
+```
+
+Using Docker (if not using docker-compose)
+```
+docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
+
+docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti toydetector
+
+./train_yolov5_model.sh
+```
+
+train_yolov5_model.sh (for debugging only)
+```
+# Copy data from S3 bucket
+aws s3 cp s3://toylocator/data /data --recursive
 
 # sanity check (optional)
 # python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
-```
 
-#### Copy Dataset and Create Yolov5 YAML (WIP)
-1. (edge) upload/submit new (incremental) dataset using s3/efs cp 
-2. (cloud) mount efs or s3 or both and update yaml files
-3. train 
-
-
-2. Copy data from S3 bucket
-```
-aws s3 cp s3://toylocator/data /data --recursive
-```
-
-3. run shell scriyamlpt to update data.yaml, update yolov5s.
-
-#### Training 
-Train and verify the result 
-```
 # (optional) smoke run for training 
 python3 train.py --img 416 --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # full training  
 python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
-# save models 
+# inference on test images 
 cp -f runs/exp0_yolov5s_results/weights/last.pt /data
 cp -f runs/exp0_yolov5s_results/weights/best.pt /data
+python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/5_toys.v2.yolov5pytorch/test/images
 
-# inference on test images 
-python3 detect.py --weights /data/best.pt --img 416 --conf 0.4 --source /data/5_toys.v2.yolov5pytorch/test/images
+model_dir=$(date +'%m-%d-%Y-%0l%p')
+aws s3 cp runs/exp0_yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/exp0_yolov5s_results s3://toylocator/model/$model_dir --recursive
 
 # verify the result (optional)
-jupyter lab --ip=0.0.0.0 --no-browser
+# jupyter lab --ip=0.0.0.0 --no-browser
 ```
+
 
 Grab trained models from S3 and moved them to the directory where detect.py is located
 ```

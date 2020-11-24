@@ -1,6 +1,6 @@
 #### Setup Instructions
-- [Annotation using object tracking](annotation)
-- [Training on AWS](training_on_aws.md)
+- [Annotation using object tracking](1_annotation)
+- [Training on AWS](2_training_on_aws)
 
 #### Trasfer Learning 
 - [On-device machine learning: TensorFlow on Android (Google Cloud Next '17)](https://www.youtube.com/watch?v=EnFyneRScQ8&feature=youtu.be&t=4m17s&ab_channel=GoogleCloudPlatform)

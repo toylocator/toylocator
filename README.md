@@ -26,7 +26,9 @@ Deep Learning application to locate a toy at a household
 s3://toylocator 
     ├── data
     │   ├── train       
-    │   ├── validate        
+    │   ├── validate    
+    │   ├── data.yaml    
+    │   ├── custom_yolov5s.yaml    
     │   └── label_inventory.txt      <- The latest label list 
 	├── model
     │   ├── best.pt   <- use for inference        
@@ -39,7 +41,7 @@ s3://toylocator
 - ***input***: webcam
 - ***output***: labelled images 
 - Using Deep SORT mechanism to track the image once labelled. 
-- See more on [different approaches to annotate toys](annotation)
+- See more on [different approaches to annotate toys](1_annotation)
 
 #### 2. Process Images
 - ***input***: labelled images 
@@ -62,7 +64,7 @@ See more on [training on the AWS](training_on_aws_stepbystep)
 - ***input***: object name (e.g., blue dump truck)
 - ***input***: trained models 
 - ***output***: rectangular on the image or display
-- See more on [inference from images or camera](inferences)
+- See more on [inference from images or camera](3_inferences)
 - simplification: live video -> image of scene 
 - testing prep: manually label objects from scenes
 

@@ -1,0 +1,22 @@
+version: '3.2'
+services:
+  yolov5cloud:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloud.yolov5
+    runtime: nvidia 
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all       
+    image: 'toydetector'
+    ipc: 'host'
+    privileged: true
+    stdin_open: true
+    tty: true
+    ports:
+      - "8888:8888"
+      - "6006:6006"
+    volumes:
+      - $HOME/.aws:/root/.aws:rw
+      - /tmp:/tmp
+    command: /bin/sh -c /usr/src/app/yolov5/train_yolov5_model.sh

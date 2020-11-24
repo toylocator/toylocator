@@ -37,7 +37,7 @@ if use_pi_cam:
              " video/x-raw, width=800, height=600, format=BGRx !" \
              " videoconvert ! video/x-raw, format=BGR ! appsink"
 
-# directry to output latest_label.txt file and raw images
+# directry to output latest_label.txt file and raw images 
 raw_data_dir = '../../data/raw/'
 
 # create data folder for output frames
@@ -72,66 +72,33 @@ cv.putText(frame, initial_txt, (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0)
 # initialize tracker using the bounding box
 tracker.init(frame, bbox)
 
-# timestamps used for fps calculation
-prev_frame_time = 0
-new_frame_time = 0
-
-# training samples stats and countdown
-target_sample_num = 50
-collected_num = 0
-countdown = 5
-
 i = 0
-while True:
+while i < 1000:
     # read frame
     ret, frame = cap.read()
     # get bbox and updates tracker
     ret, bbox = tracker.update(frame)
-
-    # fps calculation
-    new_frame_time = time.time()
-    fps = 1.0/(new_frame_time - prev_frame_time)
-    prev_frame_time = new_frame_time
-    fps = int(fps)
-
     if ret:
         # draw bbox if tracking succeeded
         drawBbox(frame, bbox)
     else:
         # print missing if not
         cv.putText(frame, 'lost', (100, 145), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
-
     # display status
-    headline_txt = f'Capturing training samples...'
-    fpd_txt = f'Camera feed @ ~{fps} fps'
-    status_txt = f'Collection Status: {collected_num}/{target_sample_num}'
+    txt = 'Capturing training samples'
+    cv.putText(frame, txt, (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv.LINE_AA)
     
-    cv.putText(frame, headline_txt, (30, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
-    cv.putText(frame, fpd_txt, (30, 40), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
-    cv.putText(frame, status_txt, (30, 60), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
-
-    ##### IMAGE CAPTURE and ANNOTATION  ######
+    ##### ADD IMAGE CAPTURE and annotation CODE HERE ######
     #######################################################
-    if i % 5 == 0 and collected_num < target_sample_num:
-        cv.imwrite(f"{output_path}/{cls}_{i:03}.jpg", frame)
+    cv.imwrite(f"{output_path}/{cls}_{i:03}.jpg", frame)
+    i += 1    
+    
+    # append the bbox coordinate to bbox_information.txt
+    bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+    bbox_path = output_path + '_annotations.txt'
+    with open(bbox_path, 'a') as file:
+        file.write(" ".join([str(a) for a in bbox_coordinate]) + '\n')
 
-        # append the bbox coordinate to bbox_information.txt
-        bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
-        bbox_path = output_path + '_annotations.txt'
-        with open(bbox_path, 'a') as file:
-            file.write(" ".join([str(a) for a in bbox_coordinate]) + '\n')
-            collected_num += 1
-
-    if collected_num >= target_sample_num:
-        exit_txt = f'Session ending in {countdown}'
-        cv.putText(frame, exit_txt, (30, 80), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
-        if i % 10 == 0:
-            countdown -= 1
-
-    if countdown < 0:
-        break
-
-    i += 1
     #######################################################
     cv.imshow('tracking', frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
