@@ -49,8 +49,15 @@ cd toylocator
 Using Docker-Compose
 - [install docker-compose](https://docs.docker.com/compose/install/) 
 ```
+# sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" > ~/docker-compose
+# chmod +x ~/docker-compose 
+# sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
 cd ~/toylocator/model
-sudo docker-compose up
+
+# use the following command only if needs to rebuild with fresh docker image 
+# docker-compose build --no-cache
+docker-compose up
 ```
 
 Using Docker (if not using docker-compose)
@@ -62,7 +69,7 @@ docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/t
 ./train_yolov5_model.sh
 ```
 
-train_yolov5_model.sh
+train_yolov5_model.sh (for debugging only)
 ```
 # Copy data from S3 bucket
 aws s3 cp s3://toylocator/data /data --recursive
