@@ -30,7 +30,7 @@ The following options are considered and selected the approach tracking an objec
 	- Cons:
 		- Bounding box does not adjust well to the object when view angle or dimension changes. 
 	- Pros:  
-		- opencv-contrib-python: ([not supporting arm64](https://forums.developer.nvidia.com/t/how-to-install-opencv-contrib-python-on-xavier/76549) Need to build a package for ARM devices. See[building opencv-contrib-python on NX](build_opencv-contrib-python) for the workaround
+		- opencv-contrib-python: ([not supporting arm64](https://forums.developer.nvidia.com/t/how-to-install-opencv-contrib-python-on-xavier/76549) Need to build a package for ARM devices. See[building opencv-contrib-python on NX](0_build_opencv-contrib-python) for the workaround
 1. (approach 5) convert to dataset without labeling. yolov5 dummy label that mark whole part of image as label
 	- Cons:
 	- Pros:  
