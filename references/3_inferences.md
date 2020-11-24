@@ -4,7 +4,8 @@ Transfer trained weights from EC2 to S3
 - exit the container `exit`
 - change S3 bucket address accordingly
 ```
-aws s3 sync . s3://path/to/data/
+aws s3 cp s3://toylocator/model/best.pt /data/best.pt
+
 ```
 
 #### Inference from images
@@ -16,7 +17,7 @@ python3 detect.py --weights /data/best.pt --img 416 --conf 0.4 --source /data/te
 
 To run inference on test dataset
 ```
-!python3 detect.py --weights toy/modeling/pretrained/best_v1024_5toys.pt --img 416 --conf 0.4 --source "toy/data/4 toys.v2.yolov5pytorch/test/images"
+!python3 detect.py --weights toy/modeling/pretrained/best_v1024_5toys.pt --img 416 --conf 0.4 --source "toy/data/test/images"
 ```
 
 #### inference from the camera, 
