@@ -152,7 +152,7 @@ if len(sys.argv) < 2:
     print("At least one augmentation type should be defined.\n e.g., python3 augmentation.py rotate flip shift scale noise")
     exit()
 
-data_path = "../../data"
+data_path = "/data"
 
 with open(os.path.join(data_path, "raw", "latest_label.txt"), 'r') as file:
     cls = file.read()
