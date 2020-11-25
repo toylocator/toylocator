@@ -11,8 +11,8 @@ import sys
 Reads images from raw data directory and prepares Yolo structure.
 """
 
-input_path = '../../data/raw/'
-output = '../../data/processed/'
+input_path = '/data/raw/'
+output = '/data/processed/'
 
 # Read in latest class label from latest_label.txt
 txt_file_path = input_path + 'latest_label.txt'
@@ -54,7 +54,7 @@ with open(inventory_path, 'r') as file:
     classes = file.read().splitlines()
 
 # raw image outputs from camera; input for auto-labeling
-rawImage_dir = '../../data/raw/{}/'.format(cls)
+rawImage_dir = '/data/raw/{}/'.format(cls)
 
 dirs = ['train', 'validate']
 

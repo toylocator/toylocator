@@ -37,8 +37,8 @@ if use_pi_cam:
              " video/x-raw, width=800, height=600, format=BGRx !" \
              " videoconvert ! video/x-raw, format=BGR ! appsink"
 
-# directry to output latest_label.txt file and raw images
-raw_data_dir = '../../data/raw/'
+# directory to output latest_label.txt file and raw images
+raw_data_dir = '/data/raw/'
 
 # create data folder for output frames
 output_path = raw_data_dir + cls
