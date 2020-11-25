@@ -47,6 +47,7 @@ docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:
 
 # mount local version 
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker
+cd src/autolabel 
 
 # inside of the docker
 python3 object_track.py <toy name> 0 

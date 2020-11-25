@@ -45,7 +45,7 @@ output_path = raw_data_dir + cls
 if not os.path.exists(output_path):
     os.makedirs(output_path)
 else:
-    print("An obejct with the same name exists; please use a different name and try again:)")
+    print("An object with the same name exists; please use a different name and try again:)")
     exit()
 
 # write the class name to latest_label.txt
@@ -99,6 +99,7 @@ while True:
         drawBbox(frame, bbox)
     else:
         # print missing if not
+        # TODO if we lost the target, we should reset the training.
         cv.putText(frame, 'lost', (100, 145), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
 
     # display status
@@ -113,7 +114,7 @@ while True:
     ##### IMAGE CAPTURE and ANNOTATION  ######
     #######################################################
     if i % 5 == 0 and collected_num < target_sample_num:
-        cv.imwrite(f"{output_path}/{cls}_{i:03}.jpg", frame)
+        cv.imwrite(f"{output_path}/{cls}_{i//5:03}.jpg", frame)
 
         # append the bbox coordinate to bbox_information.txt
         bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
