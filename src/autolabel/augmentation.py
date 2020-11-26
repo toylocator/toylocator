@@ -86,10 +86,12 @@ def horizontal_flip(img, bb):
     img_width, img_height = camera_resolution
     x_max = img_width - bb[0]
     x_min = img_width - bb[2]
-    bb[0] = x_min
-    bb[2] = x_max
-        
-    return img, bb
+    # bb[0] = x_min
+    # bb[2] = x_max
+
+    new_bb = [x_min, bb[1], x_max, bb[3]]
+
+    return img, new_bb
 
 def scale_image(image, scale_factor, bb):
 
@@ -111,7 +113,7 @@ def scale_image(image, scale_factor, bb):
 
 
 # TODO need to improve the performance (very slow)
-def sp_noise(image,prob):
+def sp_noise(image, prob):
     '''
     Add salt and pepper noise to image
     prob: Probability of the noise
@@ -130,7 +132,7 @@ def sp_noise(image,prob):
     return output
 
 
-def save_image_with_annotation(img, bb, cls, img_idx):
+def save_image_with_annotation(img, bb, cls, idx):
     """
     helper funtion: write an augmented image and annotation file
     img: image to save
@@ -138,8 +140,9 @@ def save_image_with_annotation(img, bb, cls, img_idx):
     cls: object class
     img_idx: unique image numbers for the class
     """
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)  # draw blue rectangle
-    cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{img_idx:04}.jpg"), img)
+    cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=3)  # draw blue rectangle
+#     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)  # draw blue rectangle
+    cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{idx:04}.jpg"), img)
 
     aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
     aug_bbox_path = os.path.join(data_path, 'augmented', 'aug_bbox_information.txt')
@@ -148,8 +151,50 @@ def save_image_with_annotation(img, bb, cls, img_idx):
 
     # TODO handle failure when image writing was successful while label was not.
 
-    return img_idx + 1
+    return idx + 1
 
+def run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts, scales, noises, flip):
+
+    with open(bbox_path, 'r') as file:
+        content = file.read().splitlines()
+        dimension_list = []
+        for n in content:
+            x1 = int(n.split()[0])
+            y1 = int(n.split()[1])
+            x2 = int(n.split()[0]) + int(n.split()[2])
+            y2 = int(n.split()[1]) + int(n.split()[3])
+
+            dimension_list.append([x1, y1, x2, y2])
+
+    img_idx = 0
+    for n in range(len(image_paths)):
+        bgr_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
+        rgb_image = bgr_image # cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+
+        for angle in rotation_angles:
+            img, bb = rotate_image(rgb_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for ratio in shifts:
+            img, bb = width_shift_image(rgb_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+            img, bb = height_shift_image(rgb_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        if flip:
+            img, bb = horizontal_flip(rgb_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for scale in scales:
+            img, bb = scale_image(rgb_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for noise in noises:
+            img = sp_noise(rgb_image, noise)
+            # bear_001.jpg
+            bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 # execution entry point
 if __name__ == '__main__':
@@ -196,46 +241,8 @@ if __name__ == '__main__':
 
     bbox_path = os.path.join(data_path, "raw", f"{cls}_annotations.txt")
 
-    with open(bbox_path, 'r') as file:
-        content = file.read().splitlines()
-        dimension_list = []
-        for n in content:
-            x1 = int(n.split()[0])
-            y1 = int(n.split()[1])
-            x2 = int(n.split()[0]) + int(n.split()[2])
-            y2 = int(n.split()[1]) + int(n.split()[3])
+    run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts, scales, noises, flip)
 
-            dimension_list.append([x1, y1, x2, y2])
-
-    img_idx = 0
-    for n in range(len(image_paths)):
-        original_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
-        original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-
-        for angle in rotation_angles:
-            img, bb = rotate_image(original_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-        for ratio in shifts:
-            img, bb = width_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-            img, bb = height_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-        if flip:
-            img, bb = horizontal_flip(original_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-        for scale in scales:
-            img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-        for noise in noises:
-            img = sp_noise(original_image, noise)
-            # bear_001.jpg
-            bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
-            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
 
