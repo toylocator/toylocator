@@ -6,6 +6,9 @@ import os
 import sys
 
 
+# camera_resolution = (640, 480)
+camera_resolution = (1080, 1920)
+
 def get_lists_in_dir(dir_path):
     """
     Function to obtain a list of .jpg files in a directory.
@@ -22,7 +25,7 @@ def get_lists_in_dir(dir_path):
 def rotate_image(image, angle, bb):
     
     # get image dimension
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     # get rotation matrix
     rotation_matrix = cv2.getRotationMatrix2D(center = (img_width // 2, img_height // 2), angle = angle, scale = 1.0)
    
@@ -45,7 +48,7 @@ def rotate_image(image, angle, bb):
 
 def width_shift_image(image, width_shift_range, bb):
     
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     factor = img_width * width_shift_range
     
     M = np.float32([[1,0,factor],[0,1,0]]) 
@@ -62,7 +65,7 @@ def width_shift_image(image, width_shift_range, bb):
 
 def height_shift_image( image, height_shift_range, bb):
     
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     factor = height_shift_range * img_height
     
     M = np.float32([[1,0,0],[0,1,factor]]) 
@@ -79,7 +82,7 @@ def height_shift_image( image, height_shift_range, bb):
 def horizontal_flip(img, bb):
     img =  img[:,::-1,:]
     img = np.float32(img)
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     x_max = img_width - bb[0]
     x_min = img_width - bb[2]
     bb[0] = x_min
@@ -89,7 +92,7 @@ def horizontal_flip(img, bb):
 
 def scale_image(image, scale_factor, bb):
 
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
 
     width = int(scale_factor * img_width)
     height = int(scale_factor * img_height)

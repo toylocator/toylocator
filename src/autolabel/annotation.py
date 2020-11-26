@@ -14,6 +14,9 @@ Reads images from raw data directory and prepares Yolo structure.
 input_path = '/data/raw/'
 output = '/data/processed/'
 
+# camera_resolution = (640, 480)
+camera_resolution = (1080, 1920)
+
 # Read in latest class label from latest_label.txt
 txt_file_path = input_path + 'latest_label.txt'
 with open(txt_file_path, 'r') as file:
@@ -86,7 +89,7 @@ def split_datasets(img_lst):
     return train_lst, validation_lst
 
 
-def read_annotation_yolov5(size=(640, 480)):
+def read_annotation_yolov5():
     """
     Function to generate YOLO bbox parameters.
     size: tuple containing width and height of raw image
@@ -94,8 +97,8 @@ def read_annotation_yolov5(size=(640, 480)):
 
     # image_paths = get_lists_in_dir(rawImage_dir)
 
-    dw = 1./(size[0])   # 1 / image width
-    dh = 1./(size[1])   # 1 / image height
+    dw = 1./(camera_resolution[0])   # 1 / image width
+    dh = 1./(camera_resolution[1])   # 1 / image height
 
     # Read in bbox coordinate information from bbox_information.txt
     bbox_path = input_path + cls + '_annotations.txt'

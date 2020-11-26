@@ -49,8 +49,13 @@ docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker
 cd src/autolabel 
 
-# inside of the docker
-python3 object_track.py <toy name> 0 
+# inside of the docker 
+# from video files (video file name will be used as toy name)
+aws s3 cp s3://toylocator/data/video /data/video --recursive
+python3 object_track.py file /data/train/video/<video file name>
+
+# from web camera 
+# python3 object_track.py <toy name> 0 
 ```
 
 #### (optional) Validate Labelled Images 

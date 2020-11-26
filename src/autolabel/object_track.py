@@ -19,14 +19,20 @@ if len(sys.argv) < 2:
 use_pi_cam = False
 source = 0
 if len(sys.argv) >= 3:
-    source = int(sys.argv[2])
-
-for i in range(1, len(sys.argv)):
-    optional_param = str(sys.argv[i])
-    if optional_param == "picam":
-        use_pi_cam = True
-
-cls = str(sys.argv[1])
+    cls = str(sys.argv[1])
+    source_str = str(sys.argv[2])
+    if cls == "file":
+        source = source_str
+        cls = os.path.splitext(os.path.basename(source_str))[0]
+        cls = " ".join(cls.split('_'))
+        print(f"[{cls}] training from the file:{source}")
+    else:
+        source = int(source_str)
+        print("source:", source)
+        for i in range(1, len(sys.argv)):
+            optional_param = str(sys.argv[i])
+            if optional_param == "pi-cam":
+                use_pi_cam = True
 
 # override source if raspberry camera
 if use_pi_cam:
