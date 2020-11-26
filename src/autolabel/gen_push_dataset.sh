@@ -4,6 +4,9 @@
 rm -rf ../../data/augmented/
 rm -rf ../../data/processed/
 
+# download training video 
+aws s3 cp s3://toylocator/data/video /data/video --recursive
+
 # rotate shift scale noise are optional but at least one of them needs to be specified 
 python3 augmentation.py rotate shift scale flip 
 
