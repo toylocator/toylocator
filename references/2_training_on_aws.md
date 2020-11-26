@@ -21,6 +21,9 @@ NOTE: MOFED driver for multi-node communication was not detected.
       Multi-node communication performance may be reduced.
 	- [TODO] --runttime nvidia vs --gpus all
 
+#### Training with non-square images 
+- For the rectangles 1080x1920, [--img-size 1920 --rect](https://github.com/ultralytics/yolov5/issues/700) 
+- 
 
 #### Start Instance and Docker
 
@@ -89,10 +92,10 @@ sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
 # python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
 
 # (optional) smoke run for training 
-python3 train.py --img 416 --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img 1920 --rect --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # full training  
-python3 train.py --img 416 --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # inference on test images (optional)
 cp -f runs/train/yolov5s_results/weights/last.pt /data

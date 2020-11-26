@@ -63,7 +63,7 @@ Use the jupyter noebook.
 #### Pre-processing Images and Upload to Dataset Repository  
 Run shell script
 ```
-./gen_push_dataset.sh
+src/autolabel/gen_push_dataset.sh
 ```
 
 gen_push_data.sh (for debugging only)

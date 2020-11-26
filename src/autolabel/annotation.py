@@ -193,9 +193,9 @@ if __name__ == '__main__':
         generate_annotation(output_path, image_paths, bbox_paths[i//2])
         print(bbox_paths[i//2])
 
-    num_train = len(train_paths)
-    num_validate = len(validation_paths)
-    # print("Processed {} training and {} validation".format(num_train, num_validate))
+    total_train = len(train_paths) + len(aug_train_paths)
+    total_validate = len(validation_paths) + len(aug_validation_paths)
+    print("Processed {} training and {} validation".format(total_train, total_validate))
     print("Process completed")
 
 
