@@ -124,6 +124,7 @@ while True:
 
         # append the bbox coordinate to bbox_information.txt
         bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+        # print(f"{i//5:03}: {bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]}")
         bbox_path = output_path + '_annotations.txt'
         with open(bbox_path, 'a') as file:
             file.write(" ".join([str(a) for a in bbox_coordinate]) + '\n')
