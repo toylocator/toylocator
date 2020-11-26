@@ -19,14 +19,20 @@ if len(sys.argv) < 2:
 use_pi_cam = False
 source = 0
 if len(sys.argv) >= 3:
-    source = int(sys.argv[2])
-
-for i in range(1, len(sys.argv)):
-    optional_param = str(sys.argv[i])
-    if optional_param == "picam":
-        use_pi_cam = True
-
-cls = str(sys.argv[1])
+    cls = str(sys.argv[1])
+    source_str = str(sys.argv[2])
+    if cls == "file":
+        source = source_str
+        cls = os.path.splitext(os.path.basename(source_str))[0]
+        cls = " ".join(cls.split('_'))
+        print(f"[{cls}] training from the file:{source}")
+    else:
+        source = int(source_str)
+        print("source:", source)
+        for i in range(1, len(sys.argv)):
+            optional_param = str(sys.argv[i])
+            if optional_param == "pi-cam":
+                use_pi_cam = True
 
 # override source if raspberry camera
 if use_pi_cam:
@@ -37,15 +43,15 @@ if use_pi_cam:
              " video/x-raw, width=800, height=600, format=BGRx !" \
              " videoconvert ! video/x-raw, format=BGR ! appsink"
 
-# directry to output latest_label.txt file and raw images
-raw_data_dir = '../../data/raw/'
+# directory to output latest_label.txt file and raw images
+raw_data_dir = '/data/raw/'
 
 # create data folder for output frames
 output_path = raw_data_dir + cls
 if not os.path.exists(output_path):
     os.makedirs(output_path)
 else:
-    print("An obejct with the same name exists; please use a different name and try again:)")
+    print("An object with the same name exists; please use a different name and try again:)")
     exit()
 
 # write the class name to latest_label.txt
@@ -99,6 +105,7 @@ while True:
         drawBbox(frame, bbox)
     else:
         # print missing if not
+        # TODO if we lost the target, we should reset the training.
         cv.putText(frame, 'lost', (100, 145), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
 
     # display status
@@ -113,10 +120,11 @@ while True:
     ##### IMAGE CAPTURE and ANNOTATION  ######
     #######################################################
     if i % 5 == 0 and collected_num < target_sample_num:
-        cv.imwrite(f"{output_path}/{cls}_{i:03}.jpg", frame)
+        cv.imwrite(f"{output_path}/{cls}_{i//5:03}.jpg", frame)
 
         # append the bbox coordinate to bbox_information.txt
         bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+        # print(f"{i//5:03}: {bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]}")
         bbox_path = output_path + '_annotations.txt'
         with open(bbox_path, 'a') as file:
             file.write(" ".join([str(a) for a in bbox_coordinate]) + '\n')

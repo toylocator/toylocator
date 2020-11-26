@@ -6,6 +6,9 @@ import os
 import sys
 
 
+# camera_resolution = (640, 480)
+camera_resolution = (1080, 1920)
+
 def get_lists_in_dir(dir_path):
     """
     Function to obtain a list of .jpg files in a directory.
@@ -22,7 +25,7 @@ def get_lists_in_dir(dir_path):
 def rotate_image(image, angle, bb):
     
     # get image dimension
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     # get rotation matrix
     rotation_matrix = cv2.getRotationMatrix2D(center = (img_width // 2, img_height // 2), angle = angle, scale = 1.0)
    
@@ -45,7 +48,7 @@ def rotate_image(image, angle, bb):
 
 def width_shift_image(image, width_shift_range, bb):
     
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     factor = img_width * width_shift_range
     
     M = np.float32([[1,0,factor],[0,1,0]]) 
@@ -62,7 +65,7 @@ def width_shift_image(image, width_shift_range, bb):
 
 def height_shift_image( image, height_shift_range, bb):
     
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     factor = height_shift_range * img_height
     
     M = np.float32([[1,0,0],[0,1,factor]]) 
@@ -76,37 +79,41 @@ def height_shift_image( image, height_shift_range, bb):
     
     return shifted_image, new_boundingbox
 
+
 def horizontal_flip(img, bb):
-    img =  img[:,::-1,:]
+    img = img[:,::-1,:]
     img = np.float32(img)
-    img_width, img_height = 640, 480
+    img_width, img_height = camera_resolution
     x_max = img_width - bb[0]
     x_min = img_width - bb[2]
-    bb[0] = x_min
-    bb[2] = x_max
-        
-    return img, bb
+    # bb[0] = x_min
+    # bb[2] = x_max
+
+    new_bb = [x_min, bb[1], x_max, bb[3]]
+
+    return img, new_bb
 
 def scale_image(image, scale_factor, bb):
 
-    img_width, img_height = 640, 480
+    orig_img_w, orig_img_h = camera_resolution
 
-    width = int(scale_factor * img_width)
-    height = int(scale_factor * img_height)
-    
-    scaled_img = cv2.resize(image, (width,height))
+    new_img_w = int(scale_factor * orig_img_w)
+    new_img_h = int(scale_factor * orig_img_h)
 
-    # TODO not working (horizontal flip effect0
-    # new_boundingbox = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
-    #                    np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
-    # review the following code (works)
-    new_boundingbox = [np.float32((img_width-bb[2])*scale_factor), np.float32(bb[1]*scale_factor),
-                       np.float32((img_width-bb[0])*scale_factor), np.float32(bb[3]*scale_factor)]
+    new_scaled_img = cv2.resize(image, (new_img_w, new_img_h))
+
+    new_bb = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
+              np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
+
+    # review the following code (may not work on Hongsuk's machine)
+    # new_bb = [np.float32((orig_img_w-bb[2])*scale_factor), np.float32(bb[1]*scale_factor),
+    #                    np.float32((orig_img_w-bb[0])*scale_factor), np.float32(bb[3]*scale_factor)]
       
-    return scaled_img, new_boundingbox
+    return new_scaled_img, new_bb
 
 
-def sp_noise(image,prob):
+# TODO need to improve the performance (very slow)
+def sp_noise(image, prob):
     '''
     Add salt and pepper noise to image
     prob: Probability of the noise
@@ -125,7 +132,7 @@ def sp_noise(image,prob):
     return output
 
 
-def save_image_with_annotation(img, bb, cls, img_idx):
+def save_image_with_annotation(img, bb, cls, idx):
     """
     helper funtion: write an augmented image and annotation file
     img: image to save
@@ -133,8 +140,9 @@ def save_image_with_annotation(img, bb, cls, img_idx):
     cls: object class
     img_idx: unique image numbers for the class
     """
-    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)
-    cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{img_idx:04}.jpg"), img)
+    cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=3)  # draw blue rectangle
+#     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)  # draw blue rectangle
+    cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{idx:04}.jpg"), img)
 
     aug_bbox = int(bb[0]), int(bb[1]), int(bb[2]) - int(bb[0]), int(bb[3]) - int(bb[1])
     aug_bbox_path = os.path.join(data_path, 'augmented', 'aug_bbox_information.txt')
@@ -143,93 +151,98 @@ def save_image_with_annotation(img, bb, cls, img_idx):
 
     # TODO handle failure when image writing was successful while label was not.
 
-    return img_idx + 1
+    return idx + 1
 
+def run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts, scales, noises, flip):
+
+    with open(bbox_path, 'r') as file:
+        content = file.read().splitlines()
+        dimension_list = []
+        for n in content:
+            x1 = int(n.split()[0])
+            y1 = int(n.split()[1])
+            x2 = int(n.split()[0]) + int(n.split()[2])
+            y2 = int(n.split()[1]) + int(n.split()[3])
+
+            dimension_list.append([x1, y1, x2, y2])
+
+    img_idx = 0
+    for n in range(len(image_paths)):
+        bgr_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
+        rgb_image = bgr_image # cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+
+        for angle in rotation_angles:
+            img, bb = rotate_image(rgb_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for ratio in shifts:
+            img, bb = width_shift_image(rgb_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+            img, bb = height_shift_image(rgb_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        if flip:
+            img, bb = horizontal_flip(rgb_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for scale in scales:
+            img, bb = scale_image(rgb_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
+
+        for noise in noises:
+            img = sp_noise(rgb_image, noise)
+            # bear_001.jpg
+            bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
+            img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 # execution entry point
+if __name__ == '__main__':
 
-if len(sys.argv) < 2:
-    print("At least one augmentation type should be defined.\n e.g., python3 augmentation.py rotate flip shift scale noise")
-    exit()
+    if len(sys.argv) < 2:
+        print("At least one augmentation type should be defined.\n e.g., python3 augmentation.py rotate flip shift scale noise")
+        exit()
 
-data_path = "../../data"
+    data_path = "/data"
 
-with open(os.path.join(data_path, "raw", "latest_label.txt"), 'r') as file:
-    cls = file.read()
+    with open(os.path.join(data_path, "raw", "latest_label.txt"), 'r') as file:
+        cls = file.read()
 
-rawImage_dir = os.path.join(data_path, "raw", cls)
-augImage_dir = os.path.join(data_path, "augmented", cls)
+    rawImage_dir = os.path.join(data_path, "raw", cls)
+    augImage_dir = os.path.join(data_path, "augmented", cls)
 
-if not os.path.exists(augImage_dir):
-    os.makedirs(augImage_dir)
-else:
-    print("An object with the same name exists; please use a different name and try again :)")
-    exit()
+    if not os.path.exists(augImage_dir):
+        os.makedirs(augImage_dir)
+    else:
+        print("An object with the same name exists; please use a different name and try again :)")
+        exit()
 
-rotation_angles = []
-shifts = []
-scales = []
-noises = []
-flip = False
+    rotation_angles = []
+    shifts = []
+    scales = []
+    noises = []
+    flip = False
 
-for i in range(1, len(sys.argv)):
-    aug_type = str(sys.argv[i])
-    if aug_type == "rotate":
-        rotation_angles = [30, 60, 90]
-    if aug_type == "shift":
-        shifts = [0.2, 0.4]
-    if aug_type == "scale":
-        scales = [.5, 1.5]
-    if aug_type == "noise":
-        noises = [0.1]
-    if aug_type == "flip":
-        flip = True
+    for i in range(1, len(sys.argv)):
+        aug_type = str(sys.argv[i])
+        if aug_type == "rotate":
+            rotation_angles = [30, 60, 90]
+        if aug_type == "shift":
+            shifts = [0.2, 0.4]
+        if aug_type == "scale":
+            scales = [.5, 1.5]
+        if aug_type == "noise":
+            noises = [0.1]
+        if aug_type == "flip":
+            flip = True
 
-image_paths = get_lists_in_dir(rawImage_dir)
-image_list = os.listdir(rawImage_dir)
+    image_paths = get_lists_in_dir(rawImage_dir)
+    image_list = os.listdir(rawImage_dir)
 
-bbox_path = os.path.join(data_path, "raw", f"{cls}_annotations.txt")
+    bbox_path = os.path.join(data_path, "raw", f"{cls}_annotations.txt")
 
-with open(bbox_path, 'r') as file:
-    content = file.read().splitlines()
-    dimension_list = []
-    for n in content:
-        x1 = int(n.split()[0])
-        y1 = int(n.split()[1])
-        x2 = int(n.split()[0]) + int(n.split()[2])
-        y2 = int(n.split()[1]) + int(n.split()[3])
-        
-        dimension_list.append([x1, y1, x2, y2])
+    run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts, scales, noises, flip)
 
-img_idx = 0
-for n in range(len(image_paths)):
-    original_image = cv2.imread(image_paths[n], cv2.IMREAD_COLOR)
-    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-
-    for angle in rotation_angles:
-        img, bb = rotate_image(original_image, angle, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-    for ratio in shifts:
-        img, bb = width_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-        img, bb = height_shift_image(original_image, ratio, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-    if flip:
-        img, bb = horizontal_flip(original_image, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-    for scale in scales:
-        img, bb = scale_image(original_image, scale, dimension_list[int(image_paths[n].split('_')[1].split('.')[0])])
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
-
-    for noise in noises:
-        img = sp_noise(original_image, noise)
-        # bear_001.jpg
-        bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
-        img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
 
 
