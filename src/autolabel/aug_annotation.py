@@ -10,6 +10,8 @@ import sys
 """
 Reads images from raw data directory and prepares Yolo structure.
 """
+# camera_resolution = (640, 480)
+camera_resolution = (1080, 1920)
 
 input_path = '/data/raw/'
 aug_path = '/data/augmented/'
@@ -75,6 +77,7 @@ def get_lists_in_dir(dir_path):
         image_list.append(filename)
     return image_list
 
+
 def split_datasets(img_lst):
     """
     Function to split the image_list to training/validation sets.
@@ -89,7 +92,8 @@ def split_datasets(img_lst):
     validation_lst = np.array(img_lst)[idx[splitpoint:]]
     return train_lst, validation_lst
 
-def read_annotation_yolov5(bbox_path, size=(640, 480)):
+
+def read_annotation_yolov5(bbox_path):
     """
     Function to generate YOLO bbox parameters.
     size: tuple containing width and height of raw image
@@ -97,8 +101,8 @@ def read_annotation_yolov5(bbox_path, size=(640, 480)):
 
     # image_paths = get_lists_in_dir(rawImage_dir)
 
-    dw = 1./(size[0])   # 1 / image width
-    dh = 1./(size[1])   # 1 / image height
+    dw = 1./(camera_resolution[0])   # 1 / image width
+    dh = 1./(camera_resolution[1])   # 1 / image height
 
     # Read in bbox coordinate information from bbox_information.txt
     dimension_list = []
@@ -118,6 +122,7 @@ def read_annotation_yolov5(bbox_path, size=(640, 480)):
             dimension_list.append((x, y, w, h))
 
     return dimension_list
+
 
 def generate_annotation(target, images, bbox_path):
     """
