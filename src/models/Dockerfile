@@ -12,7 +12,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Copy contents
-COPY . /usr/src/app
+COPY ../../models /usr/src/app
 
 # Copy weights
 #RUN python3 -c "from models import *; \

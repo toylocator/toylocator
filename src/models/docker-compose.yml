@@ -2,7 +2,7 @@ version: '3.2'
 services:
   yolov5cloud:
     build:
-      context: .
+      context: ../../models
       dockerfile: Dockerfile.cloud.yolov5
     runtime: nvidia 
     environment:
