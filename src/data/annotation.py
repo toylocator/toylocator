@@ -177,16 +177,14 @@ if __name__ == '__main__':
 
     aug_image_paths = get_lists_in_dir(augImage_dir)
     aug_train_paths, aug_validation_paths, aug_test_paths = split_datasets(aug_image_paths)
-
     image_sets = [train_paths, validation_paths, test_paths, aug_train_paths, aug_validation_paths, aug_test_paths]
-
     bbox_paths = [input_path + cls + '_annotations.txt', aug_path + 'aug_bbox_information.txt']
 
     for i, image_paths in enumerate(image_sets):
 
         # output path to be either {$PWD}/train or {$PWD}/validate
         # 0, 3 for train, 1, 4 for validate, and 2,5 for test
-        full_dir_path = output + dirs[i%3]
+        full_dir_path = os.path.join(output, dirs[i%3])
         print(full_dir_path)
 
         # output path in the labels folder
@@ -196,9 +194,12 @@ if __name__ == '__main__':
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
+        if not os.path.exists(os.path.join(full_dir_path, 'images')):
+            os.makedirs(os.path.join(full_dir_path, 'images'))
+
         # generate annotation files to labels folder
         # 0, 1 for original (bbox_paths[0]) and 2, 3 for augmented (bbox_paths[1])
-        annotated_image_paths, erroneous_image_paths = generate_annotation(output_path, image_paths, bbox_paths[i//2])
+        annotated_image_paths, erroneous_image_paths = generate_annotation(output_path, image_paths, bbox_paths[i//3])
 
         # copy train/validation images to images folder
         for file in annotated_image_paths:
@@ -212,11 +213,12 @@ if __name__ == '__main__':
             for file in erroneous_image_paths:
                 shutil.copy(file, error_output_path)
 
-        print(bbox_paths[i//2])
+        print(bbox_paths[i//3])
 
     total_train = len(train_paths) + len(aug_train_paths)
     total_validate = len(validation_paths) + len(aug_validation_paths)
-    print("Processed {} training and {} validation".format(total_train, total_validate))
+    total_validate = len(test_paths) + len(aug_test_paths)
+    print(f"Processed {total_train} training, {total_validate} validation, {total_validate} test")
     print("Process completed")
 
 

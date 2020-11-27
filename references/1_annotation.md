@@ -47,6 +47,7 @@ docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:
 
 # mount local version 
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
+chmod +x src/data/gen_push_dataset.sh
 
 # inside of the docker 
 # from video files (video file name will be used as toy name)

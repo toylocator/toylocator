@@ -102,11 +102,10 @@ cp -f runs/train/yolov5s_results/weights/last.pt /data
 cp -f runs/train/yolov5s_results/weights/best.pt /data
 python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images
 
-
 # upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/yolov5s_results s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/yolov5s_results4/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/yolov5s_results4 s3://toylocator/model/$model_dir --recursive
 
 # verify the result (optional)
 # jupyter lab --ip=0.0.0.0 --no-browser
