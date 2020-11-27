@@ -97,7 +97,7 @@ python3 train.py --img-size 1920 --rect --batch 4 --epochs 1 --data '/data/data.
 # full training  
 python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
-# inference on test images (optional)
+# inference on test images (optional only if test images are available)
 cp -f runs/train/yolov5s_results/weights/last.pt /data
 cp -f runs/train/yolov5s_results/weights/best.pt /data
 python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images

@@ -27,10 +27,10 @@ def split_datasets(img_lst):
     num = len(img_lst)
 
     idx = np.random.permutation(num)
-    splitpoint = int(num * .8)
-    train_lst = np.array(img_lst)[idx[:splitpoint]]   # 80/20 split
-    validation_lst = np.array(img_lst)[idx[splitpoint:]]
-    return train_lst, validation_lst
+    train_lst = np.array(img_lst)[idx[:int(num * .8)]]   # 80/20 split
+    validation_lst = np.array(img_lst)[idx[int(num * .8):int(num * .9)]]
+    test_lst = np.array(img_lst)[idx[int(num * .9):]]
+    return train_lst, validation_lst, test_lst
 
 
 def read_annotation_yolov5(bbox_path):
@@ -170,23 +170,23 @@ if __name__ == '__main__':
     rawImage_dir = '/data/raw/{}/'.format(cls)
     augImage_dir = '/data/augmented/{}/'.format(cls)
 
-    dirs = ['train', 'validate']
+    dirs = ['train', 'validate', 'test']
 
     image_paths = get_lists_in_dir(rawImage_dir)
-    train_paths, validation_paths = split_datasets(image_paths)
+    train_paths, validation_paths, test_paths = split_datasets(image_paths)
 
     aug_image_paths = get_lists_in_dir(augImage_dir)
-    aug_train_paths, aug_validation_paths = split_datasets(aug_image_paths)
+    aug_train_paths, aug_validation_paths, aug_test_paths = split_datasets(aug_image_paths)
 
-    image_sets = [train_paths, validation_paths, aug_train_paths, aug_validation_paths]
+    image_sets = [train_paths, validation_paths, test_paths, aug_train_paths, aug_validation_paths, aug_test_paths]
 
     bbox_paths = [input_path + cls + '_annotations.txt', aug_path + 'aug_bbox_information.txt']
 
     for i, image_paths in enumerate(image_sets):
 
         # output path to be either {$PWD}/train or {$PWD}/validate
-        # 0, 2 for train and 1, 3 for validated
-        full_dir_path = output + dirs[i%2]
+        # 0, 3 for train, 1, 4 for validate, and 2,5 for test
+        full_dir_path = output + dirs[i%3]
         print(full_dir_path)
 
         # output path in the labels folder
