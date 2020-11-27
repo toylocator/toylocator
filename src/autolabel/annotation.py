@@ -87,6 +87,8 @@ def generate_annotation(target, images, bbox_path):
         - target: destination for annotated .txt files
         - images: paths to the images
     """
+    good_image_paths = []
+    bad_image_paths = []
     bb = read_annotation_yolov5(bbox_path)
     for path in images:
         basename = os.path.basename(path)  # extract file name only (e.g., bear_013.jpg)
@@ -96,9 +98,19 @@ def generate_annotation(target, images, bbox_path):
         with open(label_filepath, 'w') as out_file:   # a label file is same as corresponding image file name
             cls_id = classes.index(cls)
             item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
-            out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
-            print(f"{basename_no_ext:} {cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
 
+            # validation that annotation is between 0 and 1.
+            if item[0] <= 0 or item[1] <= 0 or item[2] <= 0 or item[3] <= 0 \
+                or item[0] >= 1 or item[1] >= 1 or item[2] >= 1 or item[3] >= 1:
+                print(f"{basename_no_ext} is potentially garage: {item[0]} {item[1]} {item[2]} {item[3]}")
+                bad_image_paths.append(path)
+                continue
+
+            out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
+            good_image_paths.append(path)
+            # print(f"{basename_no_ext:} {cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
+
+    return good_image_paths, bad_image_paths
 
 # execution entry point
 if __name__ == '__main__':
@@ -178,19 +190,28 @@ if __name__ == '__main__':
         print(full_dir_path)
 
         # output path in the labels folder
-        output_path = full_dir_path + '/labels/'
+        output_path = os.path.join(full_dir_path, 'labels')
 
         # create label directory if not exists
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-        # copy train/validation images to images folder
-        for file in image_paths:
-            shutil.copy(file, full_dir_path + '/images')
-
         # generate annotation files to labels folder
         # 0, 1 for original (bbox_paths[0]) and 2, 3 for augmented (bbox_paths[1])
-        generate_annotation(output_path, image_paths, bbox_paths[i//2])
+        annotated_image_paths, erroneous_image_paths = generate_annotation(output_path, image_paths, bbox_paths[i//2])
+
+        # copy train/validation images to images folder
+        for file in annotated_image_paths:
+            shutil.copy(file, os.path.join(full_dir_path, 'images'))
+
+        if len(erroneous_image_paths) > 0:
+            error_output_path = os.path.join(output, 'error')
+            if not os.path.exists(error_output_path):
+                os.makedirs(error_output_path)
+
+            for file in erroneous_image_paths:
+                shutil.copy(file, error_output_path)
+
         print(bbox_paths[i//2])
 
     total_train = len(train_paths) + len(aug_train_paths)
