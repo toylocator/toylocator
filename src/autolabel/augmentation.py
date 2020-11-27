@@ -93,6 +93,7 @@ def horizontal_flip(img, bb):
 
     return img, new_bb
 
+
 def scale_image(image, scale_factor, bb):
 
     orig_img_w, orig_img_h = camera_resolution
@@ -196,7 +197,7 @@ def run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts
             bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
             img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
-# execution entry point
+
 if __name__ == '__main__':
 
     if len(sys.argv) < 2:

@@ -1,10 +1,9 @@
 import os
 import yaml
 
-PATH = '/data/'
-inventory_path = PATH + 'label_inventory.txt'
+data_dir = '/data/'
 
-def yaml_update(inventory_path, yaml_path):
+def gen_data_yaml(inventory_path, yaml_dir):
     """
     A function that updates the nc and names config in data.yaml and
     the nc config in custom_yolov5.yaml based on label inventory.
@@ -12,8 +11,7 @@ def yaml_update(inventory_path, yaml_path):
         - inventory_path: file path to label_inventory.txt
         - yaml_path: file path to data.yaml and custom_yolov5.yaml
     """
-
-    data_yaml_path = yaml_path + 'data.yaml'
+    data_yaml_path = os.path.join(yaml_dir, 'data.yaml')
     # model_yaml_path = yaml_path + 'custom_yolov5.yaml'
 
     # Read number of classes from label inventory list
@@ -40,8 +38,11 @@ def yaml_update(inventory_path, yaml_path):
     data['nc'] = len(class_set)
 
     # Update data.yaml
-    ### yaml.dump does not support nested lists
-    #with open(model_yaml_path, 'w') as f:
+    # yaml.dump does not support nested lists
+    # with open(model_yaml_path, 'w') as f:
     #    f.write(yaml.dump(data, default_flow_style=None))
 
-yaml_update(inventory_path, PATH)
+
+if __name__ == '__main__':
+
+    gen_data_yaml(os.path.join(data_dir, 'label_inventory.txt'), data_dir)
