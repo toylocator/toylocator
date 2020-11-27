@@ -46,16 +46,15 @@ docker build -t tracker -f Dockerfile.tracker .
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -ti tracker
 
 # mount local version 
-docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker
-cd src/autolabel 
+docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
 
 # inside of the docker 
 # from video files (video file name will be used as toy name)
 aws s3 cp s3://toylocator/data/video /data/video --recursive
-python3 object_track.py file /data/train/video/<video file name>
+python3 src/autolabel/object_track.py file /data/video/train/<video file name>
 
 # from web camera 
-# python3 object_track.py <toy name> 0 
+# python3 src/autolabel/object_track.py <toy name> 0 
 ```
 
 #### (optional) Validate Labelled Images 
@@ -64,6 +63,27 @@ Use the jupyter noebook.
 #### Pre-processing Images and Upload to Dataset Repository  
 Run shell script
 ```
-./gen_push_dataset.sh
+src/autolabel/gen_push_dataset.sh
+```
+
+gen_push_data.sh (for debugging only)
+```
+rm -rf /data/augmented
+rm -rf /data/processed
+
+# rotate shift scale noise are optional but at least one of them needs to be specified
+python3 src/autolabel/augmentation.py rotate shift flip noise
+
+# download the latest label inventory
+aws s3 cp s3://toylocator/data/label_inventory.txt /data/label_inventory.txt
+
+# convert annotation format
+python3 src/autolabel/annotation.py
+
+# upload dataset to repository
+aws s3 cp /data/processed/train s3://toylocator/data/train --recursive
+aws s3 cp /data/processed/validate s3://toylocator/data/validate --recursive
+aws s3 cp /data/processed/error s3://toylocator/error/images --recursive
+aws s3 cp /data/label_inventory.txt s3://toylocator/data/label_inventory.txt
 ```
 

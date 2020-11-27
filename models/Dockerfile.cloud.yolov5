@@ -32,6 +32,7 @@ RUN ./aws/install
 
 
 COPY train_yolov5_model.sh .
+COPY gen_yolov5_yaml.py .  
 RUN chmod +x train_yolov5_model.sh
 
 # Copy weights

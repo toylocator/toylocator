@@ -1,8 +1,8 @@
 import os
 import yaml
 
-PATH = '../../data/'
-inventory_path = PATH + 'processed/label_inventory.txt'
+PATH = '/data/'
+inventory_path = PATH + 'label_inventory.txt'
 
 def yaml_update(inventory_path, yaml_path):
     """
@@ -14,7 +14,7 @@ def yaml_update(inventory_path, yaml_path):
     """
 
     data_yaml_path = yaml_path + 'data.yaml'
-    model_yaml_path = yaml_path + 'custom_yolov5.yaml'
+    # model_yaml_path = yaml_path + 'custom_yolov5.yaml'
 
     # Read number of classes from label inventory list
     with open(inventory_path, 'r') as file:
@@ -33,8 +33,8 @@ def yaml_update(inventory_path, yaml_path):
         yaml.dump(data, f, default_flow_style=None)
 
     # Load existing custom_yolov5.yaml
-    with open(model_yaml_path) as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
+    # with open(model_yaml_path) as f:
+    #     data = yaml.load(f, Loader=yaml.FullLoader)
 
     # Update cthonfigurations
     data['nc'] = len(class_set)
