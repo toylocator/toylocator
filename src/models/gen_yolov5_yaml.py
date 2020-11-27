@@ -2,7 +2,7 @@ import os
 import yaml
 
 PATH = '/data/'
-inventory_path = PATH + '/data/label_inventory.txt'
+inventory_path = PATH + 'label_inventory.txt'
 
 def yaml_update(inventory_path, yaml_path):
     """
