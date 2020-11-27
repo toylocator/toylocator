@@ -75,12 +75,12 @@ docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/t
 Visualization (W&B, Tensorboard)
 ```
 # Weights & Biases (not very successful)
-%pip install -q wandb  
-!wandb login
+pip install -q wandb  
+wandb login
 
 # tensorboard 
-%load_ext tensorboard
-%tensorboard --logdir runs
+nohub tensorboard --logdir=runs & 
+
 ```
 
 train_yolov5_model.sh (debugging purpose)
@@ -102,20 +102,20 @@ python3 ../toy/src/models/gen_yolov5_yaml.py
 # python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_smoke --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_smoke --cache
 
 # full training  
-python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_results --cache
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/yolov5s_results s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/yolov5s_with_pt/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/yolov5s_with_pt s3://toylocator/model/$model_dir --recursive
 
 # inference on test images (optional only if test images are available)
-cp -f runs/train/yolov5s_results/weights/last.pt /data
-cp -f runs/train/yolov5s_results/weights/best.pt /data
-python3 detect.py --weights runs/train/yolov5s_results/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
+cp -f runs/train/yolov5s_with_pt/weights/last.pt /data
+cp -f runs/train/yolov5s_with_pt/weights/best.pt /data
+python3 detect.py --weights runs/train/yolov5s_with_pt/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
 
 # verify the result (optional)
 jupyter lab --ip=0.0.0.0 --no-browser

@@ -9,9 +9,9 @@
 # must run this command on NX terminal (not SSH)
 xhost +
 
-aws s3 cp s3://toylocator/model/best.pt /data/model/best.pt
+sudo aws s3 cp s3://toylocator/model/best.pt /data/model/best.pt
 
-docker run --name toylocator --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v /data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+docker run --name toydetector --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v /data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
 
 # from video file
 python3 detect.py --weights /data/model/best.pt --img-size 1920 --conf 0.4 --source /data/video/test/test_room_01.avi 
