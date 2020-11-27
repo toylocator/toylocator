@@ -8,6 +8,7 @@
 - Instance type
 	- p3.2xlarge
 	- ***g4dn.2xlarge***
+	![](g4dn.2xlarge.png)
 - AMI used (either one is good)
 	- ***Nvidia Deep Learning AMI***:  `ami-0384cb16509f0e03b`
 	- AWS Deep Learning AMI
@@ -26,14 +27,12 @@ NOTE: MOFED driver for multi-node communication was not detected.
 - 
 
 #### Start Instance and Docker
-
 Start AWS deep learning image instance 
 - specify `--instance-type`: `p3.2xlarge` or `g4dn.2xlarge` 
 - (optional) `--instance-market-options` for spot instance. 
 ```
 aws ec2 run-instances --image-id <AMI ID> --instance-type <either p3 or g4 instance> --associate-public-ip-address --key-name <key name> 
 --instance-market-options file://spot-options.json 
-
 ```
 
 Using Docker-Compose  
@@ -73,6 +72,17 @@ docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/t
 # ../toy/src/models/train_yolov5_model.sh
 ```
 
+Visualization (W&B, Tensorboard)
+```
+# Weights & Biases (not very successful)
+%pip install -q wandb  
+!wandb login
+
+# tensorboard 
+%load_ext tensorboard
+%tensorboard --logdir runs
+```
+
 train_yolov5_model.sh (debugging purpose)
 ```
 # Copy data from S3 bucket
@@ -92,23 +102,23 @@ python3 ../toy/src/models/gen_yolov5_yaml.py
 # python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img-size 1920 --rect --batch 4 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_smoke --cache
 
 # full training  
 python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
+# upload the model
+model_dir=$(date +'%m-%d-%Y-%0l%p')
+aws s3 cp runs/train/yolov5s_results/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/yolov5s_results s3://toylocator/model/$model_dir --recursive
+
 # inference on test images (optional only if test images are available)
 cp -f runs/train/yolov5s_results/weights/last.pt /data
 cp -f runs/train/yolov5s_results/weights/best.pt /data
-python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images
-
-# upload the model
-model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5s_results4/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/yolov5s_results4 s3://toylocator/model/$model_dir --recursive
+python3 detect.py --weights runs/train/yolov5s_results/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
 
 # verify the result (optional)
-# jupyter lab --ip=0.0.0.0 --no-browser
+jupyter lab --ip=0.0.0.0 --no-browser
 ```
 
 #### Other Things That Was Not Working
