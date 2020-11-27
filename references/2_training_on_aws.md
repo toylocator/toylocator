@@ -75,7 +75,7 @@ docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/t
 train_yolov5_model.sh (for debugging only)
 ```
 # Copy data from S3 bucket
-aws s3 cp s3://toylocator/data /data --recursive
+aws s3 cp s3://toylocator/data /data --recursive --exclude "video/*"
 
 # generate data.yaml and custom_yolov5s.yaml 
 nc=$(cat /data/label_inventory.txt | wc -l)
@@ -83,24 +83,26 @@ mv /data/data.yaml /data/data.template
 echo "names: [default]" > /data/data.yaml
 echo "nc: $nc" >> /data/data.yaml
 sed 1,2d /data/data.template >> /data/data.yaml
+
 mv /data/custom_yolov5s.yaml /data/custom_yolov5s.template
-echo "names: # parameters" > /data/custom_yolov5s.yaml
+echo "# parameters" > /data/custom_yolov5s.yaml
 echo "nc: $nc" >> /data/custom_yolov5s.yaml
 sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
+rm /data/*.template
 
-# sanity check (optional)
-# python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
+python3 detect.py --weights yolov5s.pt --img-size 1920 --rect --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img 1920 --rect --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # full training  
-python3 train.py --img 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # inference on test images (optional)
 cp -f runs/train/yolov5s_results/weights/last.pt /data
 cp -f runs/train/yolov5s_results/weights/best.pt /data
 python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images
+
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')
