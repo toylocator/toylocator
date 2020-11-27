@@ -94,7 +94,7 @@ def generate_annotation(target, images, bbox_path):
         basename = os.path.basename(path)  # extract file name only (e.g., bear_013.jpg)
         basename_no_ext = os.path.splitext(basename)[0]   # extract file name (e.g., bear_013)
 
-        label_filepath = target + basename_no_ext + '.txt'
+        label_filepath = os.path.join(target, f'{basename_no_ext}.txt')
         with open(label_filepath, 'w') as out_file:   # a label file is same as corresponding image file name
             cls_id = classes.index(cls)
             item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
@@ -136,8 +136,8 @@ if __name__ == '__main__':
 
     # Create yolo folder structure - images folder
     # noinspection DuplicatedCode
-    train_img_output_path = output + 'train/images/'
-    validate_img_output_path = output + 'validate/images/'
+    train_img_output_path = os.path.join(output, 'train', 'images')
+    validate_img_output_path = os.path.join(output, 'validate', 'images')
 
     img_dir = [train_img_output_path, validate_img_output_path]
     for dir in img_dir:

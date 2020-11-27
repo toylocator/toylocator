@@ -85,13 +85,13 @@ sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
 rm /data/*.template
 
 # generate data.yaml and custom_yolov5s.yaml 
-python3 gen_yolov5_yaml.py
+python3 ../toy/src/models/gen_yolov5_yaml.py
 
 # (optional) smoke run for yolov5 pre-trained model
-python3 detect.py --weights yolov5s.pt --img-size 1920 --rect --conf 0.4 --source data/images
+# python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img-size 1920 --rect --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 4 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # full training  
 python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
