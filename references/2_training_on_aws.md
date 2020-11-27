@@ -69,7 +69,8 @@ docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
 
 docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -v $PWD:/usr/src/app/toy -p 8888:8888 -p 6006:6006 -ti toydetector
 
-./train_yolov5_model.sh
+# Either run shell script or see the next section 
+# ../toy/src/models/train_yolov5_model.sh
 ```
 
 train_yolov5_model.sh (debugging purpose)
