@@ -49,7 +49,7 @@ git clone https://github.com/toylocator/toylocator.git
 cd toylocator 
 ```
 
-Using Docker-Compose
+Using Docker-Compose (stable run only)
 - [install docker-compose](https://docs.docker.com/compose/install/) 
 ```
 # sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" > ~/docker-compose
@@ -63,44 +63,45 @@ cd ~/toylocator/model
 docker-compose up
 ```
 
-Using Docker (if not using docker-compose)
+Using Docker (debugging purpose) 
 ```
 docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
 
-docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti toydetector
+docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -v $PWD:/usr/src/app/toy -p 8888:8888 -p 6006:6006 -ti toydetector
 
-./train_yolov5_model.sh
+# Either run shell script or see the next section 
+# ../toy/src/models/train_yolov5_model.sh
 ```
 
-train_yolov5_model.sh (for debugging only)
+train_yolov5_model.sh (debugging purpose)
 ```
 # Copy data from S3 bucket
-aws s3 cp s3://toylocator/data /data --recursive
+aws s3 cp s3://toylocator/data /data --recursive --exclude "video/*"
 
-# generate data.yaml and custom_yolov5s.yaml 
 nc=$(cat /data/label_inventory.txt | wc -l)
-mv /data/data.yaml /data/data.template
-echo "names: [default]" > /data/data.yaml
-echo "nc: $nc" >> /data/data.yaml
-sed 1,2d /data/data.template >> /data/data.yaml
 mv /data/custom_yolov5s.yaml /data/custom_yolov5s.template
-echo "names: # parameters" > /data/custom_yolov5s.yaml
+echo "# parameters" > /data/custom_yolov5s.yaml
 echo "nc: $nc" >> /data/custom_yolov5s.yaml
 sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
+rm /data/*.template
 
-# sanity check (optional)
-# python3 detect.py --weights yolov5s.pt --img 416 --conf 0.4 --source inference/images/
+# generate data.yaml and custom_yolov5s.yaml 
+python3 ../toy/src/models/gen_yolov5_yaml.py
+
+# (optional) smoke run for yolov5 pre-trained model
+# python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img 1920 --rect --batch 4 --epochs 5 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 4 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # full training  
-python3 train.py --img 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights '' --name yolov5s_results --cache
 
 # inference on test images (optional)
 cp -f runs/train/yolov5s_results/weights/last.pt /data
 cp -f runs/train/yolov5s_results/weights/best.pt /data
 python3 detect.py --weights runs/exp0_yolov5s_results/weights/last.pt --img 416 --conf 0.4 --source /data/test/images
+
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')

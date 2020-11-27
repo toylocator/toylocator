@@ -1,0 +1,41 @@
+# FROM nvcr.io/nvidia/l4t-ml:r32.4.2-py3
+FROM nvcr.io/nvidia/l4t-ml:r32.4.3-py3
+
+# tested on Jetson NX
+
+# Create working directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+RUN git clone https://github.com/toylocator/toylocator
+
+# Install dependencies (pip or conda)
+#RUN pip install -r requirements.txt
+
+# standard package for opencv libopencv-dev python3-opencv
+RUN apt-get update && \ 
+    apt-get install -y libffi-dev python3-pip curl unzip python3-tk libgtk2.0-0  
+		#python3-scipy python3-matplotlib python3-numpy  
+RUN pip3 install -U gsutil pyyaml tqdm cython torchvision paho-mqtt  
+#RUN pip3 install git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
+
+#download my-opencv-4.3.0.tar.gz
+#exract opencv on /usrlib
+#
+#
+
+RUN wget -nv https://github.com/toylocator/toylocator/releases/download/251-opencv/my-opencv-4.3.0.tar.gz -P /usr/lib
+#COPY my-opencv-4.3.0.tar.gz /usr/lib
+RUN tar -zxf /usr/lib/my-opencv-4.3.0.tar.gz -C /usr/lib
+
+ENV PYTHONPATH /usr/lib/opencv-4.3.0/release/python_loader
+
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+
+#COPY cam_capture.py /run
+#CMD python3 object_track.py "hello" 0 
+#COPY credentials $HOME/.aws/credentials
+

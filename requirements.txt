@@ -3,4 +3,8 @@
 
 # external requirements
 awscli
-numpy
+numpy~=1.13.3
+
+click~=7.1.2
+PyYAML~=3.12
+setuptools~=39.0.1
