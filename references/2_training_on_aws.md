@@ -76,10 +76,11 @@ Visualization (W&B, Tensorboard)
 ```
 # Weights & Biases (not very successful)
 pip install -q wandb  
-wandb login
+wandb login e96802b17d8e833421348df053b41a538a810177
+# check  /root/.netrc 
 
 # tensorboard 
-nohub tensorboard --logdir=runs & 
+nohup tensorboard --logdir=runs & 
 
 ```
 
@@ -102,10 +103,29 @@ python3 ../toy/src/models/gen_yolov5_yaml.py
 # python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_smoke --cache
+python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name smoke_16_1epcs --cache
+```
 
+
+```
 # full training  
-python3 train.py --img-size 1920 --rect --batch 16 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_results --cache
+python3 train.py --img-size 1920 --rect --batch 8 --epochs 50 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5l.pt --name yolov5l_pt_5cls_50epcs --cache
+
+model_dir=$(date +'%m-%d-%Y-%0l%p')
+aws s3 cp runs/train/yolov5l_pt_5cls_50epcs s3://toylocator/model/$model_dir --recursive
+
+python3 train.py --img-size 1920 --rect --batch 8 --epochs 50 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_pt_5cls_50epcs --cache
+
+model_dir=$(date +'%m-%d-%Y-%0l%p') 
+aws s3 cp runs/train/yolov5s_pt_5cls_50epcs s3://toylocator/model/$model_dir --recursive
+
+python3 train.py --img-size 1920 --rect --batch 8 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_pt_5cls_100epcs --cache
+
+model_dir=$(date +'%m-%d-%Y-%0l%p')
+aws s3 cp runs/train/yolov5s_pt_5cls_100epcs s3://toylocator/model/$model_dir --recursive
+
+
+
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y-%0l%p')

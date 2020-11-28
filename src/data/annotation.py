@@ -95,22 +95,22 @@ def generate_annotation(target, images, bbox_path):
         basename_no_ext = os.path.splitext(basename)[0]   # extract file name (e.g., bear_013)
 
         label_filepath = os.path.join(target, f'{basename_no_ext}.txt')
+        item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
+        # validation that annotation is between 0 and 1.
+        if item[0] <= 0 or item[1] <= 0 or item[2] <= 0 or item[3] <= 0 \
+                or item[0] >= 1 or item[1] >= 1 or item[2] >= 1 or item[3] >= 1:
+            print(f"{basename_no_ext} has out of range value: {item[0]} {item[1]} {item[2]} {item[3]}")
+            bad_image_paths.append(path)
+            continue
+
         with open(label_filepath, 'w') as out_file:   # a label file is same as corresponding image file name
             cls_id = classes.index(cls)
-            item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
-
-            # validation that annotation is between 0 and 1.
-            if item[0] <= 0 or item[1] <= 0 or item[2] <= 0 or item[3] <= 0 \
-                or item[0] >= 1 or item[1] >= 1 or item[2] >= 1 or item[3] >= 1:
-                print(f"{basename_no_ext} is potentially garage: {item[0]} {item[1]} {item[2]} {item[3]}")
-                bad_image_paths.append(path)
-                continue
-
             out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
             good_image_paths.append(path)
             # print(f"{basename_no_ext:} {cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
 
     return good_image_paths, bad_image_paths
+
 
 # execution entry point
 if __name__ == '__main__':

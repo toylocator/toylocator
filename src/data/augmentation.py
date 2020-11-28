@@ -63,7 +63,7 @@ def width_shift_image(image, width_shift_range, bb):
     return shifted_image, new_boundingbox
 
 
-def height_shift_image( image, height_shift_range, bb):
+def height_shift_image(image, height_shift_range, bb):
     
     img_width, img_height = camera_resolution
     factor = height_shift_range * img_height
@@ -153,6 +153,7 @@ def save_image_with_annotation(img, bb, cls, idx):
     # TODO handle failure when image writing was successful while label was not.
 
     return idx + 1
+
 
 def run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts, scales, noises, flip):
 
