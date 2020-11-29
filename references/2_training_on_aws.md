@@ -127,7 +127,7 @@ aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/$m
 # upload the model
 model_dir=$(date +'%m-%d-%Y')
 aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/${nc}cls_${epoch}epcs_${yolov5_pt}/$model_dir --recursive
 
 # Run inference on test images (optional)
 # python3 detect.py --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images

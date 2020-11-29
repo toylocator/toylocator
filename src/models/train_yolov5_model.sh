@@ -19,7 +19,7 @@ yolov5_pt = yolov5s
 python3 train.py --img-size 1920 --rect --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache
 
 model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/${nc}cls_${epoch}epcs_${yolov5_pt}/$model_dir --recursive
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y')
