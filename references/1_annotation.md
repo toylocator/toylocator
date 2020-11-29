@@ -36,6 +36,7 @@ The following options are considered and selected the approach tracking an objec
 	- Pros:  
 
 #### Object Tracker (approach 4)
+ 
 ```
 # configure to have access to s3 where dataset will be uploaded
 # access key and secret key for s3://toylocator should be provided
@@ -53,6 +54,10 @@ chmod +x src/data/gen_push_dataset.sh
 # from video files (video file name will be used as toy name)
 aws s3 cp s3://toylocator/data/video/train /data/video/train --recursive
 python3 src/data/object_track.py file /data/video/train/<video file name>
+
+
+# if video is not 1920x1080, rotate them using ffmpeg 
+# sudo ffmpeg -i /data/video/raw/input.MOV -q:v 3  -vf "transpose=1" /data/video/train/output.avi
 
 # from web camera 
 # python3 src/data/object_track.py <toy name> 0 
