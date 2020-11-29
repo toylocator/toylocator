@@ -91,7 +91,8 @@ train_yolov5_model.sh (debugging purpose)
 
 # training only 2 classes  
 # aws s3 cp s3://toylocator/data_2cls_bk /data --recursive --exclude "video/*"
-aws s3 cp s3://toylocator/data_5cls_bk /data --recursive --exclude "video/*"
+# aws s3 cp s3://toylocator/data_5cls_bk /data --recursive --exclude "video/*"
+aws s3 cp s3://toylocator/data /data --recursive --exclude "video/*"
 
 nc=$(cat /data/label_inventory.txt | wc -l)
 mv /data/custom_yolov5s.yaml /data/custom_yolov5s.template
@@ -115,24 +116,24 @@ python3 ../toy/gen_yolov5_yaml.py
 
 ```
 # full training  
-python3 train.py --img-size 1920 --rect --batch 8 --epochs 50 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name 5cls_50epcs --cache
+epoch = 50
+batch = 16
+yolov5_pt = yolov5s
+python3 train.py --img-size 1920 --rect --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache
 
 model_dir=$(date +'%m-%d-%Y-%0l%p') 
-aws s3 cp runs/train/yolov5s_pt_5cls_50epcs s3://toylocator/model/$model_dir --recursive
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/$model_dir --recursive
 
 # upload the model
-model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/2cls_100eps/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/2cls_100eps s3://toylocator/model/$model_dir --recursive
+model_dir=$(date +'%m-%d-%Y')
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/$model_dir --recursive
 
-# inference on test images (optional only if test images are available)
-cp -f runs/train/2cls_100eps/weights/last.pt /data
-cp -f runs/train/2cls_100eps/weights/best.pt /data
-
-python3 detect.py --weights runs/train/2cls_100eps/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
+# Run inference on test images (optional)
+# python3 detect.py --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
 
 # verify the result (optional)
-jupyter lab --ip=0.0.0.0 --no-browser 
+# jupyter lab --ip=0.0.0.0 --no-browser 
 ```
 
 #### Other Things That Was Not Working

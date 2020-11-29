@@ -4,7 +4,7 @@ import random
 import glob
 import os
 import sys
-
+# from skimage.util import random_noise
 
 # camera_resolution = (640, 480)
 camera_resolution = (1080, 1920)
@@ -112,6 +112,9 @@ def scale_image(image, scale_factor, bb):
       
     return new_scaled_img, new_bb
 
+# def sp_noise_fast(image):
+#     return random_noise(image, mode='s&p', clip=True)
+
 
 # TODO need to improve the performance (very slow)
 def sp_noise(image, prob):
@@ -193,6 +196,8 @@ def run_augmentation(image_paths, image_list, bbox_path, rotation_angles, shifts
             img_idx = save_image_with_annotation(img, bb, cls, img_idx)
 
         for noise in noises:
+            # img = sp_noise_fast(rgb_image)
+            # slower but no scklrn-image depedency
             img = sp_noise(rgb_image, noise)
             # bear_001.jpg
             bb = dimension_list[int(image_paths[n].split('_')[1].split('.')[0])]
