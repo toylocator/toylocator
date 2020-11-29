@@ -47,10 +47,11 @@ docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:
 
 # mount local version 
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
+chmod +x src/data/gen_push_dataset.sh
 
 # inside of the docker 
 # from video files (video file name will be used as toy name)
-aws s3 cp s3://toylocator/data/video /data/video --recursive
+aws s3 cp s3://toylocator/data/video/train /data/video/train --recursive
 python3 src/data/object_track.py file /data/video/train/<video file name>
 
 # from web camera 
@@ -83,6 +84,7 @@ python3 src/data/annotation.py
 # upload dataset to repository
 aws s3 cp /data/processed/train s3://toylocator/data/train --recursive
 aws s3 cp /data/processed/validate s3://toylocator/data/validate --recursive
+aws s3 cp /data/processed/test s3://toylocator/data/test --recursive
 aws s3 cp /data/processed/error s3://toylocator/error/images --recursive
 aws s3 cp /data/label_inventory.txt s3://toylocator/data/label_inventory.txt
 ```

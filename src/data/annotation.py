@@ -27,10 +27,10 @@ def split_datasets(img_lst):
     num = len(img_lst)
 
     idx = np.random.permutation(num)
-    splitpoint = int(num * .8)
-    train_lst = np.array(img_lst)[idx[:splitpoint]]   # 80/20 split
-    validation_lst = np.array(img_lst)[idx[splitpoint:]]
-    return train_lst, validation_lst
+    train_lst = np.array(img_lst)[idx[:int(num * .8)]]   # 80/20 split
+    validation_lst = np.array(img_lst)[idx[int(num * .8):int(num * .9)]]
+    test_lst = np.array(img_lst)[idx[int(num * .9):]]
+    return train_lst, validation_lst, test_lst
 
 
 def read_annotation_yolov5(bbox_path):
@@ -95,22 +95,22 @@ def generate_annotation(target, images, bbox_path):
         basename_no_ext = os.path.splitext(basename)[0]   # extract file name (e.g., bear_013)
 
         label_filepath = os.path.join(target, f'{basename_no_ext}.txt')
+        item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
+        # validation that annotation is between 0 and 1.
+        if item[0] <= 0 or item[1] <= 0 or item[2] <= 0 or item[3] <= 0 \
+                or item[0] >= 1 or item[1] >= 1 or item[2] >= 1 or item[3] >= 1:
+            print(f"{basename_no_ext} has out of range value: {item[0]} {item[1]} {item[2]} {item[3]}")
+            bad_image_paths.append(path)
+            continue
+
         with open(label_filepath, 'w') as out_file:   # a label file is same as corresponding image file name
             cls_id = classes.index(cls)
-            item = bb[int(basename_no_ext.split('_')[-1])]  # e.g., 0.556, 0.6145, 0.3718, 0.5958
-
-            # validation that annotation is between 0 and 1.
-            if item[0] <= 0 or item[1] <= 0 or item[2] <= 0 or item[3] <= 0 \
-                or item[0] >= 1 or item[1] >= 1 or item[2] >= 1 or item[3] >= 1:
-                print(f"{basename_no_ext} is potentially garage: {item[0]} {item[1]} {item[2]} {item[3]}")
-                bad_image_paths.append(path)
-                continue
-
             out_file.write(f"{cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
             good_image_paths.append(path)
             # print(f"{basename_no_ext:} {cls_id} {item[0]} {item[1]} {item[2]} {item[3]}")
 
     return good_image_paths, bad_image_paths
+
 
 # execution entry point
 if __name__ == '__main__':
@@ -170,23 +170,21 @@ if __name__ == '__main__':
     rawImage_dir = '/data/raw/{}/'.format(cls)
     augImage_dir = '/data/augmented/{}/'.format(cls)
 
-    dirs = ['train', 'validate']
+    dirs = ['train', 'validate', 'test']
 
     image_paths = get_lists_in_dir(rawImage_dir)
-    train_paths, validation_paths = split_datasets(image_paths)
+    train_paths, validation_paths, test_paths = split_datasets(image_paths)
 
     aug_image_paths = get_lists_in_dir(augImage_dir)
-    aug_train_paths, aug_validation_paths = split_datasets(aug_image_paths)
-
-    image_sets = [train_paths, validation_paths, aug_train_paths, aug_validation_paths]
-
+    aug_train_paths, aug_validation_paths, aug_test_paths = split_datasets(aug_image_paths)
+    image_sets = [train_paths, validation_paths, test_paths, aug_train_paths, aug_validation_paths, aug_test_paths]
     bbox_paths = [input_path + cls + '_annotations.txt', aug_path + 'aug_bbox_information.txt']
 
     for i, image_paths in enumerate(image_sets):
 
         # output path to be either {$PWD}/train or {$PWD}/validate
-        # 0, 2 for train and 1, 3 for validated
-        full_dir_path = output + dirs[i%2]
+        # 0, 3 for train, 1, 4 for validate, and 2,5 for test
+        full_dir_path = os.path.join(output, dirs[i%3])
         print(full_dir_path)
 
         # output path in the labels folder
@@ -196,9 +194,12 @@ if __name__ == '__main__':
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
+        if not os.path.exists(os.path.join(full_dir_path, 'images')):
+            os.makedirs(os.path.join(full_dir_path, 'images'))
+
         # generate annotation files to labels folder
         # 0, 1 for original (bbox_paths[0]) and 2, 3 for augmented (bbox_paths[1])
-        annotated_image_paths, erroneous_image_paths = generate_annotation(output_path, image_paths, bbox_paths[i//2])
+        annotated_image_paths, erroneous_image_paths = generate_annotation(output_path, image_paths, bbox_paths[i//3])
 
         # copy train/validation images to images folder
         for file in annotated_image_paths:
@@ -212,11 +213,12 @@ if __name__ == '__main__':
             for file in erroneous_image_paths:
                 shutil.copy(file, error_output_path)
 
-        print(bbox_paths[i//2])
+        print(bbox_paths[i//3])
 
     total_train = len(train_paths) + len(aug_train_paths)
     total_validate = len(validation_paths) + len(aug_validation_paths)
-    print("Processed {} training and {} validation".format(total_train, total_validate))
+    total_validate = len(test_paths) + len(aug_test_paths)
+    print(f"Processed {total_train} training, {total_validate} validation, {total_validate} test")
     print("Process completed")
 
 

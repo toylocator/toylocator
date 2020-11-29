@@ -9,7 +9,7 @@ Deep Learning application to locate a toy at a household
 - incremental training (overcoming catastropic forgetting)
 - training on edge device (minimum computing resources)
 
-## :weary: Overall Architecture / Flow 
+## :weary: Deep Learning Pipeline 
 1. Collect: images from camera 
 2. Label: automaticallly with the minimum input by the user (select area at the beginning and enter the name) with yolov5 format
 4. Process: augmentation 
@@ -26,6 +26,7 @@ Deep Learning application to locate a toy at a household
 s3://toylocator 
     ├── data
     │   ├── video       
+    │   │    ├── raw   <- .MOV video files that needs to be converted      
     │   │    ├── train   <- dataset collection from a simulated video camera      
     │   │    └── test    <- A scene where inference would be conducted   
     │   ├── validate    
