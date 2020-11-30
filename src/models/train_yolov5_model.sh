@@ -13,9 +13,10 @@ rm /data/*.template
 # generate data.yaml and custom_yolov5s.yaml
 python3 gen_yolov5_yaml.py
 
-epoch = 300
-batch = 16
-yolov5_pt = yolov5m
+epoch=300
+batch=16
+yolov5_pt=yolov5m
+iou=0.4
 python3 train.py --img-size 1920 --rect --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache
 
 # upload the model
