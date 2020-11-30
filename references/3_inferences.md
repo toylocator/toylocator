@@ -11,10 +11,10 @@ xhost +
 
 sudo aws s3 cp s3://toylocator/model/best.pt /data/model/best.pt
 
-docker run --name yolov5nx --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v /data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
+docker run --name -rm yolov5nx --privileged -e DISPLAY=$DISPLAY --runtime nvidia -v /data:/data -v /tmp:/tmp -p 8888:8888 -p 6006:6006 -ti yolov5
 
 # from video file
-python3 detect.py --weights /data/model/best.pt --img-size 1920 --conf 0.4 --source /data/video/test/test_room_01.avi 
+python3 detect.py --weights /data/model/best.pt --img-size 1920 --conf 0.4 --source /data/video/test/test_room_02.avi 
 
 # generic detection for sanity check (please change to 0)
 python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
