@@ -18,24 +18,28 @@ def gen_data_yaml(inventory_path, yaml_dir):
     with open(inventory_path, 'r') as file:
         class_set = list(file.read().splitlines())
 
-    # Load existing data.yaml
-    with open(data_yaml_path) as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
+    # # Load existing data.yaml
+    # with open(data_yaml_path) as f:
+    #     data = yaml.load(f, Loader=yaml.FullLoader)
 
+    data_yaml = {}
     # Update configurations
-    data['nc'] = len(class_set)
-    data['names'] = class_set
+    data_yaml['nc'] = len(class_set)
+    data_yaml['names'] = class_set
+    data_yaml['train'] = "/data/train/images"
+    data_yaml['val'] = "/data/validate/images"
+    data_yaml['test'] = "/data/test/images"
 
     # Update data.yaml
     with open(data_yaml_path, 'w') as f:
-        yaml.dump(data, f, default_flow_style=None)
+        yaml.dump(data_yaml, f, default_flow_style=None)
 
     # Load existing custom_yolov5.yaml
     # with open(model_yaml_path) as f:
     #     data = yaml.load(f, Loader=yaml.FullLoader)
 
     # Update cthonfigurations
-    data['nc'] = len(class_set)
+    data_yaml['nc'] = len(class_set)
 
     # Update data.yaml
     # yaml.dump does not support nested lists

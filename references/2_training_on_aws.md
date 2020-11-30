@@ -64,16 +64,18 @@ docker-compose up
 
 Using Docker (debugging purpose) 
 ```
-docker build -t yolov5cloud -f Dockerfile.cloud.yolov5 .
+docker build -t toydetector -f Dockerfile.cloud.yolov5 .
 
 docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -v $PWD:/usr/src/app/toy -p 8888:8888 -p 6006:6006 -ti toydetector
 
 # Either run shell script or see the next section 
-# ../toy/src/models/train_yolov5_model.sh
+# chmod +x ../toy/train_yolov5_model.sh
+# ../toy/train_yolov5_model.sh
 ```
 
 Visualization (W&B, Tensorboard)
 ```
+# if you build the docker fresh, no need the following. 
 # Weights & Biases (not very successful)
 pip install -q wandb  
 wandb login e96802b17d8e833421348df053b41a538a810177
@@ -87,6 +89,10 @@ nohup tensorboard --logdir=runs &
 train_yolov5_model.sh (debugging purpose)
 ```
 # Copy data from S3 bucket
+
+# training only 2 classes  
+# aws s3 cp s3://toylocator/data_2cls_bk /data --recursive --exclude "video/*"
+# aws s3 cp s3://toylocator/data_5cls_bk /data --recursive --exclude "video/*"
 aws s3 cp s3://toylocator/data /data --recursive --exclude "video/*"
 
 nc=$(cat /data/label_inventory.txt | wc -l)
@@ -97,48 +103,39 @@ sed 1,2d /data/custom_yolov5s.template >> /data/custom_yolov5s.yaml
 rm /data/*.template
 
 # generate data.yaml and custom_yolov5s.yaml 
-python3 ../toy/src/models/gen_yolov5_yaml.py
+# python3 ../toy/src/models/gen_yolov5_yaml.py
+python3 ../toy/gen_yolov5_yaml.py
 
 # (optional) smoke run for yolov5 pre-trained model
 # python3 detect.py --weights yolov5s.pt --img-size 1920 --conf 0.4 --source data/images
 
 # (optional) smoke run for training 
-python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name smoke_16_1epcs --cache
+# Out of memory if batch size is bigger than 16 so far. Hope to find bigger instance or reduce the image resolution. 
+# python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name smoke_24_1epcs --cache
 ```
 
 
 ```
 # full training  
-python3 train.py --img-size 1920 --rect --batch 8 --epochs 50 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5l.pt --name yolov5l_pt_5cls_50epcs --cache
-
-model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5l_pt_5cls_50epcs s3://toylocator/model/$model_dir --recursive
-
-python3 train.py --img-size 1920 --rect --batch 8 --epochs 50 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_pt_5cls_50epcs --cache
-
-model_dir=$(date +'%m-%d-%Y-%0l%p') 
-aws s3 cp runs/train/yolov5s_pt_5cls_50epcs s3://toylocator/model/$model_dir --recursive
-
-python3 train.py --img-size 1920 --rect --batch 8 --epochs 100 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name yolov5s_pt_5cls_100epcs --cache
-
-model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5s_pt_5cls_100epcs s3://toylocator/model/$model_dir --recursive
-
-
-
+epoch=300
+batch=16
+yolov5_pt=yolov5m
+iou=0.4
+python3 train.py --img-size 1920 --rect --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache --log-imgs 100
 
 # upload the model
-model_dir=$(date +'%m-%d-%Y-%0l%p')
-aws s3 cp runs/train/yolov5s_with_pt/weights/last.pt s3://toylocator/model/last.pt
-aws s3 cp runs/train/yolov5s_with_pt s3://toylocator/model/$model_dir --recursive
+model_dir=$(date +'%m-%d-%Y')
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/${nc}cls_${epoch}epcs_${yolov5_pt}/$model_dir --recursive
 
-# inference on test images (optional only if test images are available)
-cp -f runs/train/yolov5s_with_pt/weights/last.pt /data
-cp -f runs/train/yolov5s_with_pt/weights/best.pt /data
-python3 detect.py --weights runs/train/yolov5s_with_pt/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
+# Test the model 
+python3 test.py --img-size 1920 --batch $batch --data '/data/data.yaml' --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --iou-thres ${iou} --task test 
+
+# Run inference on test images (optional)
+# python3 detect.py --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images
 
 # verify the result (optional)
-jupyter lab --ip=0.0.0.0 --no-browser
+# jupyter lab --ip=0.0.0.0 --no-browser 
 ```
 
 #### Other Things That Was Not Working
