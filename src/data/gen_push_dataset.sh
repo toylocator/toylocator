@@ -5,7 +5,7 @@ rm -rf /data/augmented
 rm -rf /data/processed
 
 # rotate shift scale noise are optional but at least one of them needs to be specified 
-python3 src/data/augmentation.py rotate shift flip noise  
+python3 src/data/augmentation.py rotate shift flip scale # noise
 
 # download the latest label inventory 
 aws s3 cp s3://toylocator/data/label_inventory.txt /data/label_inventory.txt

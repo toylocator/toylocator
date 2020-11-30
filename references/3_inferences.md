@@ -20,7 +20,7 @@ python3 detect.py --weights /data/model/best.pt --img-size 1920 --conf 0.4 --sou
 python3 detect.py --source 1 --weights yolov5s.pt --conf 0.4
 
 # run toy detection with camera (please change to 0)
-python3 detect.py --source 1 --weights /data/model/best.pt --conf 0.4
+python3 detect.py --img-size 1920 --source 1 --weights /data/model/best.pt --iou-thres 0.1
 
 ```
 
