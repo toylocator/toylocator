@@ -102,6 +102,13 @@ def scale_image(image, scale_factor, bb):
     new_img_h = int(scale_factor * orig_img_h)
 
     new_scaled_img = cv2.resize(image, (new_img_w, new_img_h))
+    
+    #paste current scaled iamge to the black background
+    canvas = np.zeros_like(image)
+    x_lim = int(min(scale_factor,1)*orig_img_w)
+    y_lim = int(min(scale_factor,1)*orig_img_h)
+    canvas[:y_lim,:x_lim,:] = new_scaled_img[:y_lim,:x_lim,:]
+    new_scaled_img = canvas
 
     new_bb = [np.float32(bb[0] * scale_factor), np.float32(bb[1] * scale_factor),
               np.float32(bb[2] * scale_factor), np.float32(bb[3] * scale_factor)]
