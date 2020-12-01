@@ -5,7 +5,8 @@
 # training only 2 classes
 # aws s3 cp s3://toylocator/data_2cls_bk /data --recursive --exclude "video/*"
 # aws s3 cp s3://toylocator/data_5cls_bk /data --recursive --exclude "video/*"
-aws s3 cp s3://toylocator/data /data --recursive --exclude "video/*"
+rm -rf /data
+aws s3 cp s3://toylocator/data_tg /data --recursive --exclude "video/*"
 
 nc=$(cat /data/label_inventory.txt | wc -l)
 mv /data/custom_yolov5s.yaml /data/custom_yolov5s.template
@@ -26,14 +27,14 @@ python3 ../toy/gen_yolov5_yaml.py
 # python3 train.py --img-size 1920 --rect --batch 16 --epochs 1 --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights yolov5s.pt --name smoke_24_1epcs --cache
 
 # full training
-epoch=300
+epoch=200
 batch=64
 yolov5_pt=yolov5s
 python3 train.py --img 640 --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache --log-imgs 100
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y')
-aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt s3://toylocator/model/last.pt
+aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/best.pt s3://toylocator/model/best.pt
 aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/${nc}cls_${epoch}epcs_${yolov5_pt}/$model_dir --recursive
 
 # Test the model
