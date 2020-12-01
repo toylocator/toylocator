@@ -22,9 +22,9 @@ NOTE: MOFED driver for multi-node communication was not detected.
       Multi-node communication performance may be reduced.
 	- [TODO] --runttime nvidia vs --gpus all
 
-#### Training with non-square images 
-- For the rectangles 1080x1920, [--img-size 1920 --rect](https://github.com/ultralytics/yolov5/issues/700) 
-- 
+#### Training with high resolution images 
+- For the rectangles 1080x1920, [--img-size 1920 --rect](https://github.com/ultralytics/yolov5/issues/700) => validation shows good results but not with the production inference. 
+- It took longer to train the model
 
 #### Start Instance and Docker
 Start AWS deep learning image instance 
@@ -38,7 +38,7 @@ aws ec2 run-instances --image-id <AMI ID> --instance-type <either p3 or g4 insta
 Using Docker-Compose  
 - [install awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install)
 ```
-# if missing, install awscli 
+# install awscli if missing 
 # sudo apt install -y awscli 
 aws configure
 # enter access key and secret key for s3://toylocator 
@@ -64,13 +64,13 @@ docker-compose up
 
 Using Docker (debugging purpose) 
 ```
-docker build -t toydetector -f Dockerfile.cloud.yolov5 .
+docker build -t toytrainer -f Dockerfile.cloud.yolov5 . --no-cache
 
-docker run --ipc=host --name toydetector --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -v $PWD:/usr/src/app/toy -p 8888:8888 -p 6006:6006 -ti toydetector
+docker run --ipc=host --name toytrainer --rm --privileged --gpus all -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -p 6006:6006 -ti toytrainer
 
 # Either run shell script or see the next section 
 # chmod +x ../toy/train_yolov5_model.sh
-# ../toy/train_yolov5_model.sh
+# ./train_yolov5_model.sh
 ```
  For debugging, see [train_yolov5_model.sh](../src/models/train_yolov5_model.sh)
 
