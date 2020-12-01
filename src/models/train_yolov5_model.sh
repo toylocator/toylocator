@@ -27,10 +27,9 @@ python3 ../toy/gen_yolov5_yaml.py
 
 # full training
 epoch=300
-batch=16
-yolov5_pt=yolov5m
-iou=0.4
-python3 train.py --img-size 1920 --rect --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache --log-imgs 100
+batch=64
+yolov5_pt=yolov5s
+python3 train.py --img 640 --batch $batch --epochs $epoch --data '/data/data.yaml' --cfg /data/custom_yolov5s.yaml --weights ${yolov5_pt}.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --cache --log-imgs 100
 
 # upload the model
 model_dir=$(date +'%m-%d-%Y')
@@ -38,7 +37,8 @@ aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt s3://toy
 aws s3 cp runs/train/${nc}cls_${epoch}epcs_${yolov5_pt} s3://toylocator/model/${nc}cls_${epoch}epcs_${yolov5_pt}/$model_dir --recursive
 
 # Test the model
-python3 test.py --img-size 1920 --batch $batch --data '/data/data.yaml' --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --iou-thres ${iou} --task test
+iou=0.4
+# python3 test.py --img-size 1920 --batch $batch --data '/data/data.yaml' --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/best.pt --name ${nc}cls_${epoch}epcs_${yolov5_pt} --iou-thres ${iou} --task test
 
 # Run inference on test images (optional)
 # python3 detect.py --weights runs/train/${nc}cls_${epoch}epcs_${yolov5_pt}/weights/last.pt --img-size 1920 --conf 0.4 --source /data/test/images

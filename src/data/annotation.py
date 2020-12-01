@@ -119,7 +119,8 @@ if __name__ == '__main__':
     Reads images from raw data directory and prepares Yolo structure.
     """
     # camera_resolution = (640, 480)
-    camera_resolution = (1080, 1920)
+    # camera_resolution = (1080, 1920)
+    camera_resolution = (640, 640)
 
     input_path = '/data/raw/'
     aug_path = '/data/augmented/'

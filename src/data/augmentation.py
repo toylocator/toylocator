@@ -7,7 +7,8 @@ import sys
 # from skimage.util import random_noise
 
 # camera_resolution = (640, 480)
-camera_resolution = (1080, 1920)
+#camera_resolution = (1080, 1920)
+camera_resolution = (640, 640)
 
 def get_lists_in_dir(dir_path):
     """
@@ -151,7 +152,7 @@ def save_image_with_annotation(img, bb, cls, idx):
     cls: object class
     img_idx: unique image numbers for the class
     """
-    cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=3)  # draw blue rectangle
+    # cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=1)  # draw blue rectangle
 #     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)  # draw blue rectangle
     cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{idx:04}.jpg"), img)
 
