@@ -2,7 +2,7 @@
 
 aws s3 sync s3://toylocator/data/video/train /data/video/train
 
-python3 src/data/object_track.py file "/data/video/train/${1}"
+python3 src/data/object_track.py "/data/video/train/${1}"
 
 rm -rf /data/augmented
 rm -rf /data/processed
