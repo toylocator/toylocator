@@ -245,7 +245,7 @@ if __name__ == '__main__':
         if aug_type == "shift":
             shifts = [0.2, 0.4]
         if aug_type == "scale":
-            scales = [.5, 1.5]
+            scales = [.3, .6, 1.3, 1.7]
         if aug_type == "noise":
             noises = [0.1]
         if aug_type == "flip":

@@ -99,7 +99,7 @@ prev_frame_time = 0
 new_frame_time = 0
 
 # training samples stats and countdown
-target_sample_num = 50
+target_sample_num = 100
 collected_num = 0
 countdown = 5
 
