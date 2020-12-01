@@ -1,5 +1,9 @@
 #!/bin/sh
 
+aws s3 sync s3://toylocator/data/video/train /data/video/train
+
+python3 src/data/object_track.py file "/data/video/train/${1}"
+
 rm -rf /data/augmented
 rm -rf /data/processed
 
@@ -13,8 +17,8 @@ aws s3 cp s3://toylocator/data/label_inventory.txt /data/label_inventory.txt
 python3 src/data/annotation.py
 
 # upload dataset to repository
-aws s3 cp /data/processed/train s3://toylocator/data/train --recursive
-aws s3 cp /data/processed/validate s3://toylocator/data/validate --recursive
-aws s3 cp /data/processed/test s3://toylocator/data/test --recursive
-aws s3 cp /data/processed/error s3://toylocator/error/images --recursive
-aws s3 cp /data/label_inventory.txt s3://toylocator/data/label_inventory.txt
+# aws s3 cp /data/processed/train s3://toylocator/data/train --recursive
+# aws s3 cp /data/processed/validate s3://toylocator/data/validate --recursive
+# aws s3 cp /data/processed/test s3://toylocator/data/test --recursive
+# aws s3 cp /data/processed/error s3://toylocator/error/images --recursive
+# aws s3 cp /data/label_inventory.txt s3://toylocator/data/label_inventory.txt
