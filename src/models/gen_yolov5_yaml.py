@@ -27,8 +27,8 @@ def gen_data_yaml(inventory_path, yaml_dir):
     data_yaml['nc'] = len(class_set)
     data_yaml['names'] = class_set
     data_yaml['train'] = "/data/train/images"
-    data_yaml['val'] = "/data/validate/images"
-    data_yaml['test'] = "/data/test/images"
+    data_yaml['val'] = "/data/test/images"
+    # data_yaml['test'] = "/data/test/images"
 
     # Update data.yaml
     with open(data_yaml_path, 'w') as f:
