@@ -18,6 +18,9 @@ def reduce_frame_if_toobig(frame):
     if height > width:
         margin = (height - width)//2
         frame = frame[margin:-margin, :, :]
+    else:
+        margin = (width - height)//2
+        frame = frame[:, margin:-margin, :]
 
     return cv.resize(frame, (640, 640))
 
@@ -99,7 +102,7 @@ prev_frame_time = 0
 new_frame_time = 0
 
 # training samples stats and countdown
-target_sample_num = 100
+target_sample_num = 200
 collected_num = 0
 countdown = 5
 
@@ -138,8 +141,8 @@ while True:
 
     ##### IMAGE CAPTURE and ANNOTATION  ######
     #######################################################
-    if i % 5 == 0 and collected_num < target_sample_num:
-        cv.imwrite(f"{output_path}/{cls}_{i//5:03}.jpg", frame)
+    if i % 3 == 0 and collected_num < target_sample_num:
+        cv.imwrite(f"{output_path}/{cls}_{i//3:03}.jpg", frame)
 
         # append the bbox coordinate to bbox_information.txt
         bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
