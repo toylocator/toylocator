@@ -40,14 +40,30 @@ Training Data
 	- live inference: 
 	![](live_inference_red_car_01.png)
 	![](live_inference_red_car_02.png)
-- 2 class: 
+- 2 classes: 
 	- [training performance](https://wandb.ai/taeil/v4/runs/139mg8cb?workspace=user-taeil) 
+		- ![[Pasted image 20201202111416.png]]
+		- Notable issues
+			- two differents toy (both car) are confused by the model
+				- ![](car_classes_confusion.png)
+			- rotatation augmention includes lots of background as object and make background sensitive to the object detection 
+				- ![[45rotated_toomuch_bg.png]]
+			-  
+			- 
+	- live inference: 
+- 3 classes 
+	- [training performance](https://wandb.ai/taeil/v4/runs/139mg8cb?workspace=user-taeil) 
+		- ![[Pasted image 20201202111416.png]]
+		- Notable issues
+			- two differents toy (both car) are confused by the model 
+		- ![](car_classes_confusion.png)
 	- live inference: 
 
 #### v5 [low resolution : 640] 
 - white background 
 - increased training data collection 
-- 4 scale, 4 rotate, flip
-- 1 class: 
+- 4 scale, flip, no rotation, no shift, no noise
 - 2 class: 
+	- [training performance](https://wandb.ai/taeil/v5/runs/35tsdi4f/overview?workspace=user-taeil)  
+	- 
 

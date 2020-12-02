@@ -241,13 +241,13 @@ if __name__ == '__main__':
     for i in range(1, len(sys.argv)):
         aug_type = str(sys.argv[i])
         if aug_type == "rotate":
-            rotation_angles = [30, 60, 90]
+            rotation_angles = [90, 180, 270]
         if aug_type == "shift":
             shifts = [0.2, 0.4]
         if aug_type == "scale":
             scales = [.3, .6, 1.3, 1.7]
         if aug_type == "noise":
-            noises = [0.1]
+            noises = [0.03]
         if aug_type == "flip":
             flip = True
 

@@ -12,7 +12,7 @@ yolov5_pt=$4
 aws s3 sync s3://toylocator/data/${version} /data --exclude "video/*"
 
 nc=$(cat /data/label_inventory.txt | wc -l)
-cp -y /model/yolov${yolov5_pt}.yaml /data
+cp models/yolov${yolov5_pt}.yaml /data
 mv /data/yolov${yolov5_pt}.yaml /data/custom_yolov5.template
 echo "# parameters" > /data/custom_yolov5.yaml
 echo "nc: $nc" >> /data/custom_yolov5.yaml

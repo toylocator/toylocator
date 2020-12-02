@@ -72,8 +72,8 @@ Run the shell script to augment and upload the dataset
 src/data/gen_push_dataset.sh <file or cam number> <video file name or object name>
 
 # example: 
-# src/data/gen_push_dataset.sh file "red spiderman.avi" 
-# src/data/gen_push_dataset.sh 0 "fire truck"
+# src/data/gen_push_dataset.sh file "red spiderman.avi" v4
+# src/data/gen_push_dataset.sh 0 "fire truck" v4
 
 ```
 
