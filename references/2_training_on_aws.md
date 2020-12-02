@@ -70,7 +70,8 @@ docker run --ipc=host --name toytrainer --rm --privileged --gpus all -v /tmp:/tm
 
 # Either run shell script or see the next section 
 # chmod +x ../toy/train_yolov5_model.sh
-# ./train_yolov5_model.sh
+# ./train_yolov5_model.sh <model version> <epochs> <batch size> <yolov pt>
+# e.g., ./train_yolov5_model.sh v4 100 64 5s
 ```
  For debugging, see [train_yolov5_model.sh](../src/models/train_yolov5_model.sh)
 
