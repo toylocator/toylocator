@@ -7,7 +7,8 @@ import sys
 # from skimage.util import random_noise
 
 # camera_resolution = (640, 480)
-camera_resolution = (1080, 1920)
+#camera_resolution = (1080, 1920)
+camera_resolution = (640, 640)
 
 def get_lists_in_dir(dir_path):
     """
@@ -151,7 +152,7 @@ def save_image_with_annotation(img, bb, cls, idx):
     cls: object class
     img_idx: unique image numbers for the class
     """
-    cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=3)  # draw blue rectangle
+    # cv2.rectangle(img=img, pt1=(bb[0], bb[1]), pt2=(bb[2], bb[3]), color=(255, 0, 0), thickness=1)  # draw blue rectangle
 #     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 0, 0), 2, 1)  # draw blue rectangle
     cv2.imwrite(os.path.join(data_path, "augmented", cls, f"{cls}_aug_{idx:04}.jpg"), img)
 
@@ -240,13 +241,13 @@ if __name__ == '__main__':
     for i in range(1, len(sys.argv)):
         aug_type = str(sys.argv[i])
         if aug_type == "rotate":
-            rotation_angles = [30, 60, 90]
+            rotation_angles = [90, 180, 270]
         if aug_type == "shift":
             shifts = [0.2, 0.4]
         if aug_type == "scale":
-            scales = [.5, 1.5]
+            scales = [.3, .6, 1.3, 1.7]
         if aug_type == "noise":
-            noises = [0.1]
+            noises = [0.03]
         if aug_type == "flip":
             flip = True
 

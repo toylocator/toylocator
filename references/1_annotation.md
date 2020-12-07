@@ -38,24 +38,24 @@ The following options are considered and selected the approach tracking an objec
 #### Object Tracker (approach 4)
  
 ```
-# configure to have access to s3 where dataset will be uploaded
-# access key and secret key for s3://toylocator should be provided
+# install awscli if missing 
+# sudo apt install -y awscli 
+aws configure
+# enter access key and secret key for s3://toylocator 
 
 docker build -t tracker -f Dockerfile.tracker .
 
 # stable tracker
 docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v $HOME/.aws:/root/.aws:rw -ti tracker
 
-# mount local version 
-docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
-chmod +x src/data/gen_push_dataset.sh
+# mount with dev mode
+# docker run --name tracker --privileged --runtime nvidia --rm -e DISPLAY -v /tmp:/tmp -v /data:/data -v $PWD:/usr/src/app -v $HOME/.aws:/root/.aws:rw -p 8888:8888 -ti tracker 
 
 # inside of the docker 
 # from video files (video file name will be used as toy name)
 aws s3 cp s3://toylocator/data/video/train /data/video/train --recursive
 python3 src/data/object_track.py file /data/video/train/<video file name>
-
-
+	
 # if video is not 1920x1080, rotate them using ffmpeg 
 # sudo ffmpeg -i /data/video/raw/input.MOV -q:v 3  -vf "transpose=1" /data/video/train/output.avi
 
@@ -63,34 +63,17 @@ python3 src/data/object_track.py file /data/video/train/<video file name>
 # python3 src/data/object_track.py <toy name> 0 
 ```
 
-#### (optional) Validate Labelled Images 
-Use the jupyter noebook.  
+#### (Optional) Validate Labelled Images 
+[jupyter noebook for visual validation](../notebook/validate_yolov5_dataset.ipynb)  
 
 #### Pre-processing Images and Upload to Dataset Repository  
-Run shell script
+Run the shell script to augment and upload the dataset
 ```
-src/data/gen_push_dataset.sh
-```
+src/data/gen_push_dataset.sh <file or cam number> <video file name or object name>
 
-gen_push_data.sh (for debugging only)
-```
-rm -rf /data/augmented
-rm -rf /data/processed
+# example: 
+# src/data/gen_push_dataset.sh file "red spiderman.avi" v4
+# src/data/gen_push_dataset.sh 0 "fire truck" v4
 
-# rotate shift scale noise are optional but at least one of them needs to be specified
-python3 src/data/augmentation.py rotate shift flip noise
-
-# download the latest label inventory
-aws s3 cp s3://toylocator/data/label_inventory.txt /data/label_inventory.txt
-
-# convert annotation format
-python3 src/data/annotation.py
-
-# upload dataset to repository
-aws s3 cp /data/processed/train s3://toylocator/data/train --recursive
-aws s3 cp /data/processed/validate s3://toylocator/data/validate --recursive
-aws s3 cp /data/processed/test s3://toylocator/data/test --recursive
-aws s3 cp /data/processed/error s3://toylocator/error/images --recursive
-aws s3 cp /data/label_inventory.txt s3://toylocator/data/label_inventory.txt
 ```
 

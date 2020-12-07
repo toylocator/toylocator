@@ -3,13 +3,26 @@ import os
 import sys
 import time
 
+
 def drawBbox(frame, bbox):
     """
     A function that draws bounding box on a frame based on the bbox dimensions.
     """
     x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
-    cv.rectangle(frame, (x, y), ((x + w), (y+h)), (255, 0, 0), 2, 1)
+    cv.rectangle(frame, (x, y), ((x + w), (y+h)), (255, 0, 0), 1, 1)
 
+
+def reduce_frame_if_toobig(frame):
+
+    height, width, layers = frame.shape
+    if height > width:
+        margin = (height - width)//2
+        frame = frame[margin:-margin, :, :]
+    else:
+        margin = (width - height)//2
+        frame = frame[:, margin:-margin, :]
+
+    return cv.resize(frame, (640, 640))
 
 # placeholder for object class
 if len(sys.argv) < 2:
@@ -50,9 +63,9 @@ raw_data_dir = '/data/raw/'
 output_path = raw_data_dir + cls
 if not os.path.exists(output_path):
     os.makedirs(output_path)
-else:
-    print("An object with the same name exists; please use a different name and try again:)")
-    exit()
+# else:
+#     print("An object with the same name exists; please use a different name and try again:)")
+#     exit()
 
 # write the class name to latest_label.txt
 txt_file_path = raw_data_dir + 'latest_label.txt'
@@ -60,6 +73,8 @@ with open(txt_file_path, 'w') as file:
     file.write(cls)
 
 cap = cv.VideoCapture(source)
+nframes = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+print("nframe", nframes)
 
 # time.sleep(10)
 # cap.set(3, 640)
@@ -71,6 +86,10 @@ tracker = cv.TrackerCSRT_create()
 
 # read initial frame for customized bounding box
 ret, frame = cap.read()
+
+# reduce the frame size smaller
+frame = reduce_frame_if_toobig(frame)
+
 bbox = cv.selectROI('Tracking', frame, False)
 initial_txt = 'Please draw a bounding box'
 cv.putText(frame, initial_txt, (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
@@ -83,7 +102,7 @@ prev_frame_time = 0
 new_frame_time = 0
 
 # training samples stats and countdown
-target_sample_num = 50
+target_sample_num = 200
 collected_num = 0
 countdown = 5
 
@@ -91,6 +110,9 @@ i = 0
 while True:
     # read frame
     ret, frame = cap.read()
+
+    # reduce the frame size smaller
+    frame = reduce_frame_if_toobig(frame)
     # get bbox and updates tracker
     ret, bbox = tracker.update(frame)
 
@@ -119,8 +141,8 @@ while True:
 
     ##### IMAGE CAPTURE and ANNOTATION  ######
     #######################################################
-    if i % 5 == 0 and collected_num < target_sample_num:
-        cv.imwrite(f"{output_path}/{cls}_{i//5:03}.jpg", frame)
+    if i % 3 == 0 and collected_num < target_sample_num:
+        cv.imwrite(f"{output_path}/{cls}_{i//3:03}.jpg", frame)
 
         # append the bbox coordinate to bbox_information.txt
         bbox_coordinate = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])

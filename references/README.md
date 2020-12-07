@@ -32,6 +32,13 @@
 - [Learning Deep Neural Networks Incrementally](https://medium.com/heuritech/learning-deep-neural-networks-incrementally-3e005e4fb4bc)
 - [Pseudo-Rehearsal learning](https://arxiv.org/abs/1705.08690)
 - [Lifelong Learning with DEN](https://arxiv.org/abs/1708.01547)
+- [Few-Shot Class-Incremental Learning](https://paperswithcode.com/paper/few-shot-class-incremental-learning) 
+- [Incremental Learning In Online Scenario](https://paperswithcode.com/paper/incremental-learning-in-online-scenario) 
+- [Incremental Few-Shot Object Detection
+](https://paperswithcode.com/paper/incremental-few-shot-object-detection) 
+- [more on openreview: incremental + cvpr](https://openreview.net/group?id=ML_Reproducibility_Challenge/2020)  
+- [Maintaining Discrimination and Fairness in Class Incremental Learning](https://paperswithcode.com/paper/maintaining-discrimination-and-fairness-in) 
+- Knowledge distillation (KD) 
 
 #### Inference on Edge devices 
 - [tensorflow lite/examples](https://github.com/tensorflow/examples/tree/master/lite)
